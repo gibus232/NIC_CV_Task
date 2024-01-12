@@ -9,6 +9,7 @@ history = 500
 
 threshold = 50
 
+
 # Create the background subtractor object
 backSub = cv2.createBackgroundSubtractorMOG2(history=history, varThreshold=threshold)
 
