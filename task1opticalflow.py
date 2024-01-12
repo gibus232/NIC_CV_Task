@@ -16,6 +16,7 @@ def get_good_features(frame):
 capture = cv2.VideoCapture('http://192.168.217.103/mjpg/video.mjpg')  # Device index (0 for default camera)
 
 # Take first frame and find corners in it
+
 ret, old_frame = capture.read()
 old_gray = cv2.cvtColor(old_frame, cv2.COLOR_BGR2GRAY)
 p0 = get_good_features(old_frame)  # Points to track

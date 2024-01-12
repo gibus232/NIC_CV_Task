@@ -40,6 +40,7 @@ while True:
             # Draw a rectangle around the detected motion
             cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
+
     # Display the original frame with the contours superimposed
     cv2.imshow('Motion Detection', frame)
 
