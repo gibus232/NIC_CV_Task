@@ -6,6 +6,7 @@ cap = cv2.VideoCapture('http://192.168.217.103/mjpg/video.mjpg')
 
 # Set the history and threshold for the background subtraction algorithm
 history = 500
+
 threshold = 50
 
 # Create the background subtractor object
