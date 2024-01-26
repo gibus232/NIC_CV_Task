@@ -1,61 +1,57 @@
-import cv2
 import numpy as np
+import cv2
 
-# Lucas-Kanade optical flow parameters
-lk_params = dict(winSize=(15, 15), maxLevel=2,
-                 criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
+cap_video = cv2.VideoCapture("227-video.mp4")
 
+feature_parameters = dict(maxCorners=100, qualityLevel=0.3, minDistance=7, blockSize=7)
 
-# Function to get good features to track
-def get_good_features(frame):
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    return cv2.goodFeaturesToTrack(gray, maxCorners=100, qualityLevel=0.3, minDistance=7)
+lk_parameters = dict(
+    winSize=(15, 15),
+    maxLevel=2,
+    criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03),
+)
 
+random_color = np.random.randint(0, 255, (100, 3))
 
-# Initialize the camera and grab a reference to the first frame
-capture = cv2.VideoCapture('http://192.168.217.103/mjpg/video.mjpg')  # Device index (0 for default camera)
+ret, previous_frame = cap_video.read()
+previous_gray = cv2.cvtColor(previous_frame, cv2.COLOR_BGR2GRAY)
+p0_point = cv2.goodFeaturesToTrack(previous_gray, mask=None, **feature_parameters)
 
-# Take first frame and find corners in it
-
-ret, old_frame = capture.read()
-old_gray = cv2.cvtColor(old_frame, cv2.COLOR_BGR2GRAY)
-p0 = get_good_features(old_frame)  # Points to track
-
-# Create a mask image for drawing purposes
-mask = np.zeros_like(old_frame)
-
-while capture.isOpened():
-    ret, frame = capture.read()
+mask_drawing = np.zeros_like(previous_frame)
+while 1:
+    ret, frame = cap_video.read()
+    if not ret:
+        print("No frames available!")
+        break
     frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-    # Calculate optical flow
-    p1, st, err = cv2.calcOpticalFlowPyrLK(old_gray, frame_gray, p0, None, **lk_params)
+    p1, st_d, error = cv2.calcOpticalFlowPyrLK(
+        previous_gray, frame_gray, p0_point, None, **lk_parameters
+    )
 
-    # if p1 is None, simply continue without drawing lines
     if p1 is not None:
-        good_new = p1[st == 1]
-        good_old = p0[st == 1]
+        good_new_point = p1[st_d == 1]
+        good_old_point = p0_point[st_d == 1]
 
-        # Draw the tracks
-        for i, (new, old) in enumerate(zip(good_new, good_old)):
-            a, b = new.ravel()
-            c, d = old.ravel()
-            a, b, c, d = int(a), int(b), int(c), int(d)  # Convert to int
-            mask = cv2.line(mask, (a, b), (c, d), (0, 255, 0), 2)
-            frame = cv2.circle(frame, (a, b), 5, (0, 255, 0), -1)
-        img = cv2.add(frame, mask)
-    else:
-        print("No points to track.")
+    for i, (new_point, old_point) in enumerate(zip(good_new_point, good_old_point)):
+        a, b = new_point.ravel()
+        c, d = old_point.ravel()
+        mask_drawing = cv2.line(
+            mask_drawing,
+            (int(a), int(b)),
+            (int(c), int(d)),
+            random_color[i].tolist(),
+            2,
+        )
+        frame = cv2.circle(frame, (int(a), int(b)), 5, random_color[i].tolist(), -1)
+    img = cv2.add(frame, mask_drawing)
+    cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
+    cv2.resizeWindow('frame', 700, 700)
+    cv2.imshow("frame", img)
 
-    # Show the frame with optical flow tracks
-    cv2.imshow('Optical Flow - Lucas-Kanade', img)
-
-    # Update the previous frame and previous points
-    old_gray = frame_gray.copy()
-    p0 = good_new.reshape(-1, 1, 2)
-
-    if cv2.waitKey(10) & 0xFF == ord('q'):
+    previous_gray = frame_gray.copy()
+    p0_point = good_new_point.reshape(-1, 1, 2)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
         break
-
-capture.release()
+cap_video.release()
 cv2.destroyAllWindows()

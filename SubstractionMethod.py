@@ -2,7 +2,8 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-cap = cv2.VideoCapture('http://192.168.217.103/mjpg/video.mjpg')
+cap = cv2.VideoCapture('229-video.mp4')
+# ip cam addres http://192.168.217.103/mjpg/video.mjpg
 backSub = cv2.createBackgroundSubtractorMOG2()
 
 while True:
@@ -30,7 +31,7 @@ while True:
 
 
     for countour in countours:
-        if cv2.contourArea(countour) < 50:
+        if cv2.contourArea(countour) < 200:
             continue
         (x, y, w ,h) = cv2.boundingRect(countour)
         cv2.rectangle(frame_out, (x,y), (x+w,y+h), (0, 0, 255), 2)
