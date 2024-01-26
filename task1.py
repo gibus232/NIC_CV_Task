@@ -2,7 +2,8 @@ import cv2
 import numpy as np
 
 # Initialize the video capture object
-cap = cv2.VideoCapture('http://192.168.217.103/mjpg/video.mjpg')
+cap = cv2.VideoCapture('232-video.mp4')
+
 
 # Set the history and threshold for the background subtraction algorithm
 history = 500
@@ -34,7 +35,7 @@ while True:
     # Draw the contours on the original frame
     for contour in contours:
         # You can set a threshold to detect only significant motion
-        if cv2.contourArea(contour) > 60:
+        if cv2.contourArea(contour) > 600:
             # Get the bounding box coordinates from the contour
             x, y, w, h = cv2.boundingRect(contour)
             # Draw a rectangle around the detected motion
@@ -42,9 +43,13 @@ while True:
 
 
     # Display the original frame with the contours superimposed
+    cv2.namedWindow("Motion Detection", cv2.WINDOW_NORMAL)
+    cv2.resizeWindow('Motion Detection', 700, 700)
     cv2.imshow('Motion Detection', frame)
 
     # Display the foreground mask
+    cv2.namedWindow("Foreground Mask", cv2.WINDOW_NORMAL)
+    cv2.resizeWindow('Foreground Mask', 700, 700)
     cv2.imshow('Foreground Mask', fgMask)
 
     # Wait for the user to press 'q' to close the window
