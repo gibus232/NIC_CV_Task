@@ -2,34 +2,54 @@ import numpy as np
 import cv2
 import time
 
+#Задание параметров для алгоритма
+
 lk_params = dict(winSize=(15, 15),
-                 maxLevel=2,
+                 maxLevel=1,
                  criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
 
-feature_params = dict(maxCorners=20,
+feature_params = dict(maxCorners=30,
                       qualityLevel=0.1,
                       minDistance=10,
                       blockSize=7)
 
 trajectory_len = 40
-detect_interval = 5
+detect_interval = 2
 trajectories = []
 frame_idx = 0
 
-cap = cv2.VideoCapture('230-video.mp4')
+cap = cv2.VideoCapture('232-video.mp4')
+_, frame = cap.read()
+gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+gray = cv2.GaussianBlur(gray, (25,25),0)
+previous_frame = gray
 
+motion_threshold = 20
 while True:
 
     # start time to calculate FPS
     start = time.time()
 
-    suc, frame = cap.read()
-    frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    img = frame.copy()
+    _, frame = cap.read()
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    gray = cv2.GaussianBlur(gray, (25,25),0)
 
+    frame_diff = cv2.absdiff(previous_frame,gray)
+
+    _,threshold = cv2.threshold(frame_diff, motion_threshold, 255, cv2.THRESH_BINARY)
+
+    countours, _ = cv2.findContours(threshold, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    for countour in countours:
+        if cv2.contourArea(countour) < 500:
+            continue
+        (x, y, w, h) = cv2.boundingRect(countour)
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+    img = frame.copy()
     # Calculate optical flow for a sparse feature set using the iterative Lucas-Kanade Method
     if len(trajectories) > 0:
-        img0, img1 = prev_gray, frame_gray
+        img0, img1 = prev_gray, gray
         p0 = np.float32([trajectory[-1] for trajectory in trajectories]).reshape(-1, 1, 2)
         p1, _st, _err = cv2.calcOpticalFlowPyrLK(img0, img1, p0, None, **lk_params)
         p0r, _st, _err = cv2.calcOpticalFlowPyrLK(img1, img0, p1, None, **lk_params)
@@ -57,7 +77,7 @@ while True:
 
     # Update interval - When to update and detect new features
     if frame_idx % detect_interval == 0:
-        mask = np.zeros_like(frame_gray)
+        mask = np.zeros_like(gray)
         mask[:] = 255
 
         # Lastest point in latest trajectory
@@ -65,14 +85,14 @@ while True:
             cv2.circle(mask, (x, y), 5, 0, -1)
 
         # Detect the good features to track
-        p = cv2.goodFeaturesToTrack(frame_gray, mask=mask, **feature_params)
+        p = cv2.goodFeaturesToTrack(gray, mask=mask, **feature_params)
         if p is not None:
             # If good features can be tracked - add that to the trajectories
             for x, y in np.float32(p).reshape(-1, 2):
                 trajectories.append([(x, y)])
 
     frame_idx += 1
-    prev_gray = frame_gray
+    prev_gray = gray
 
     # End time
     end = time.time()

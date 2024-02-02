@@ -2,13 +2,13 @@ import cv2
 import numpy as np
 
 # Initialize the video capture object
-cap = cv2.VideoCapture('229-video.mp4')
+cap = cv2.VideoCapture('232-video.mp4')
 
 
 # Set the history and threshold for the background subtraction algorithm
-history = 500
 
-motion_threshold = 50
+
+motion_threshold = 60
 
 _, frame = cap.read()
 gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
