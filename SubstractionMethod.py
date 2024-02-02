@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
 import time
 
 #Задание параметров для алгоритма
@@ -12,9 +11,9 @@ lk_params = dict(winSize=(15, 15),
 feature_params = dict(maxCorners=30,
                       qualityLevel=0.1,
                       minDistance=10,
-                      blockSize=7)
+                      blockSize=5)
 
-trajectory_len = 40
+trajectory_len = 400
 detect_interval = 2
 trajectories = []
 frame_idx = 0
@@ -27,30 +26,25 @@ while True:
 
     start = time.time()
 
-    ret, frame = cap.read()
+    _, frame = cap.read()
 
     frame = cv2.resize(frame,(640,480))
     frame_out = frame.copy()
     imgNoBg = backSub.apply(frame)
 
-
-
-    contours, _ = cv2.findContours(imgNoBg, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    frame_ct = cv2.drawContours(frame, contours, -1, (0,255,0), 2)
-
-
-
-    retval, mask_thresh = cv2.threshold(imgNoBg, 180, 255, cv2.THRESH_BINARY)
+    _, mask_thresh = cv2.threshold(imgNoBg, 180, 255, cv2.THRESH_BINARY)
 
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (4, 4))
 
     mask_eroded = cv2.morphologyEx(mask_thresh, cv2.MORPH_OPEN, kernel)
 
+    mask_eroded = cv2.morphologyEx(mask_eroded, cv2.MORPH_CLOSE, kernel)
+
     countours, _ = cv2.findContours(mask_eroded, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
 
     for countour in countours:
-        if cv2.contourArea(countour) < 200:
+        if cv2.contourArea(countour) < 400:
             continue
         (x, y, w ,h) = cv2.boundingRect(countour)
         cv2.rectangle(frame_out, (x,y), (x+w,y+h), (0, 0, 255), 2)
@@ -60,8 +54,8 @@ while True:
     if len(trajectories) > 0:
         img0, img1 = prev_gray, mask_eroded
         p0 = np.float32([trajectory[-1] for trajectory in trajectories]).reshape(-1, 1, 2)
-        p1, _st, _err = cv2.calcOpticalFlowPyrLK(img0, img1, p0, None, **lk_params)
-        p0r, _st, _err = cv2.calcOpticalFlowPyrLK(img1, img0, p1, None, **lk_params)
+        p1, _, _ = cv2.calcOpticalFlowPyrLK(img0, img1, p0, None, **lk_params)
+        p0r, _, _ = cv2.calcOpticalFlowPyrLK(img1, img0, p1, None, **lk_params)
         d = abs(p0 - p0r).reshape(-1, 2).max(-1)
         good = d < 1
 
@@ -102,8 +96,13 @@ while True:
 
     frame_idx += 1
     prev_gray = mask_eroded
-
+    # End time
+    end = time.time()
+    # calculate the FPS for current frame detection
+    fps = 1 / (end - start)
+    cv2.putText(img, f"{fps:.2f} FPS", (20, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
     cv2.imshow('final', img)
+    cv2.imshow('mask', mask_eroded)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break

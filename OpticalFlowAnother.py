@@ -11,9 +11,9 @@ lk_params = dict(winSize=(15, 15),
 feature_params = dict(maxCorners=30,
                       qualityLevel=0.1,
                       minDistance=10,
-                      blockSize=7)
+                      blockSize=5)
 
-trajectory_len = 40
+trajectory_len = 400
 detect_interval = 2
 trajectories = []
 frame_idx = 0
