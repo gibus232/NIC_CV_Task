@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import time
 
-#Задание параметров для алгоритма
+#Задание параметров для алгоритма Лукаса-Канаде и good features to track
 
 lk_params = dict(winSize=(15, 15),
                  maxLevel=1,
@@ -50,10 +50,11 @@ while True:
         cv2.rectangle(frame_out, (x,y), (x+w,y+h), (0, 0, 255), 2)
 
     img = frame_out.copy()
-    # Calculate optical flow for a sparse feature set using the iterative Lucas-Kanade Method
+    # Расчет оптического потока
     if len(trajectories) > 0:
         img0, img1 = prev_gray, mask_eroded
         p0 = np.float32([trajectory[-1] for trajectory in trajectories]).reshape(-1, 1, 2)
+
         p1, _, _ = cv2.calcOpticalFlowPyrLK(img0, img1, p0, None, **lk_params)
         p0r, _, _ = cv2.calcOpticalFlowPyrLK(img1, img0, p1, None, **lk_params)
         d = abs(p0 - p0r).reshape(-1, 2).max(-1)
@@ -61,7 +62,7 @@ while True:
 
         new_trajectories = []
 
-        # Get all the trajectories
+        # Building trajectories
         for trajectory, (x, y), good_flag in zip(trajectories, p1.reshape(-1, 2), good):
             if not good_flag:
                 continue
@@ -69,40 +70,37 @@ while True:
             if len(trajectory) > trajectory_len:
                 del trajectory[0]
             new_trajectories.append(trajectory)
-            # Newest detected point
+            # Last points detetcted
             cv2.circle(img, (int(x), int(y)), 2, (0, 0, 255), -1)
 
         trajectories = new_trajectories
 
-        # Draw all the trajectories
+        # Drawing trajectories lines
         cv2.polylines(img, [np.int32(trajectory) for trajectory in trajectories], False, (0, 255, 0))
         cv2.putText(img, 'track count: %d' % len(trajectories), (20, 50), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0), 2)
 
-    # Update interval - When to update and detect new features
+    # Update interval
     if frame_idx % detect_interval == 0:
         mask = np.zeros_like(mask_eroded)
         mask[:] = 255
 
-        # Lastest point in latest trajectory
         for x, y in [np.int32(trajectory[-1]) for trajectory in trajectories]:
             cv2.circle(mask, (x, y), 5, 0, -1)
 
-        # Detect the good features to track
-        p = cv2.goodFeaturesToTrack(mask_eroded, mask=mask, **feature_params)
-        if p is not None:
-            # If good features can be tracked - add that to the trajectories
-            for x, y in np.float32(p).reshape(-1, 2):
+        goodF = cv2.goodFeaturesToTrack(mask_eroded, mask=mask, **feature_params)
+        if goodF is not None:
+            for x, y in np.float32(goodF).reshape(-1, 2):
                 trajectories.append([(x, y)])
 
     frame_idx += 1
     prev_gray = mask_eroded
-    # End time
+
     end = time.time()
-    # calculate the FPS for current frame detection
+
     fps = 1 / (end - start)
     cv2.putText(img, f"{fps:.2f} FPS", (20, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
     cv2.imshow('final', img)
-    cv2.imshow('mask', mask_eroded)
+    cv2.imshow('mask', mask)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
