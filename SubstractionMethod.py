@@ -23,12 +23,19 @@ trajectories = []
 frame_idx = 0
 points = []
 cap = cv2.VideoCapture('232-video.mp4')
+
+
+
+blank = np.zeros((480,640,3),dtype=np.uint8)
+
 # ip cam addres http://192.168.217.103/mjpg/video.mjpg
 backSub = cv2.createBackgroundSubtractorMOG2()
-center_pointsX = []
-center_pointsY = []
-ocx = []
-ocy = []
+center_pointsX = 0
+center_pointsY = 0
+cX = 0
+cY = 0
+ocx = 0
+ocy = 0
 pointsDict = {'cnt num':'points'}
 while True:
 
@@ -38,6 +45,7 @@ while True:
     _, frame = cap.read()
 
     frame = cv2.resize(frame,(640,480))
+
     frame_out = frame.copy()
     imgNoBg = backSub.apply(frame)
 
@@ -58,22 +66,20 @@ while True:
     for countour in countours:
         if cv2.contourArea(countour) < 6500:
             continue
-        maxc = max(countours)
-        (x, y, w, h) = cv2.boundingRect(countour)
+        maxc = max(countours, key = cv2.contourArea)
+        (x, y, w, h) = cv2.boundingRect(maxc)
         cv2.rectangle(img, (x,y), (x+w,y+h), (0, 0, 255), 2)
         cX = int(x+w / 2)
         cY = int(y+h / 2)
         center = (cX,cY)
-        cv2.circle(img, ((cX, cY)), 5, (0, 255, 255), -1)
-        cv2.circle(img, ((cX, cY)), 0, (255, 0, 255), -1)
-        center_pointsX.append(cX)
-        center_pointsY.append(cY)
-    if len(ocx) > 1:
-        for i in range(len(center_pointsX)):
-            cv2.circle(img, ((center_pointsX[i], center_pointsY[i])), 3, (255, 0, 255), -1)
-            cv2.line(img, (ocx[i], ocy[i]), (center_pointsX[i], center_pointsY[i]), (255, 255, 255), 5)
-    ocx = center_pointsX
-    ocy = center_pointsY
+        cv2.circle(img, (cX, cY), 5, (0, 255, 255), -1)
+
+    if ocx !=0 and ocx:
+        cv2.line(blank, (ocx, ocy), (cX, cY), (255, 255, 255), 5)
+    img = cv2.add(blank,img)
+    ocx = cX
+    ocy = cY
+
     center_pointsX = []
     center_pointsY = []
 
