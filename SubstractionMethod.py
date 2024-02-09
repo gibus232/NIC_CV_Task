@@ -1,3 +1,7 @@
+import math
+from collections import deque
+from random import random
+
 import cv2
 import numpy as np
 import time
@@ -17,12 +21,17 @@ trajectory_len = 400
 detect_interval = 2
 trajectories = []
 frame_idx = 0
-
+points = []
 cap = cv2.VideoCapture('232-video.mp4')
 # ip cam addres http://192.168.217.103/mjpg/video.mjpg
 backSub = cv2.createBackgroundSubtractorMOG2()
-
+center_pointsX = []
+center_pointsY = []
+ocx = []
+ocy = []
+pointsDict = {'cnt num':'points'}
 while True:
+
 
     start = time.time()
 
@@ -32,24 +41,42 @@ while True:
     frame_out = frame.copy()
     imgNoBg = backSub.apply(frame)
 
-    _, mask_thresh = cv2.threshold(imgNoBg, 180, 255, cv2.THRESH_BINARY)
+    _, mask_thresh = cv2.threshold(imgNoBg, 150, 255, cv2.THRESH_BINARY)
 
-    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (4, 4))
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (6, 6))
+    kernel2 = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
+    # mask_eroded = cv2.morphologyEx(mask_thresh, cv2.MORPH_OPEN, kernel)
 
-    mask_eroded = cv2.morphologyEx(mask_thresh, cv2.MORPH_OPEN, kernel)
+    mask_eroded = cv2.morphologyEx(mask_thresh, cv2.MORPH_CLOSE, kernel2)
 
-    mask_eroded = cv2.morphologyEx(mask_eroded, cv2.MORPH_CLOSE, kernel)
+    mask_eroded = cv2.morphologyEx(mask_eroded, cv2.MORPH_OPEN, kernel)
 
+    mask_eroded = cv2.dilate(mask_eroded, None, iterations=2)
     countours, _ = cv2.findContours(mask_eroded, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-
-    for countour in countours:
-        if cv2.contourArea(countour) < 400:
-            continue
-        (x, y, w ,h) = cv2.boundingRect(countour)
-        cv2.rectangle(frame_out, (x,y), (x+w,y+h), (0, 0, 255), 2)
-
     img = frame_out.copy()
+    for countour in countours:
+        if cv2.contourArea(countour) < 6500:
+            continue
+        maxc = max(countours)
+        (x, y, w, h) = cv2.boundingRect(countour)
+        cv2.rectangle(img, (x,y), (x+w,y+h), (0, 0, 255), 2)
+        cX = int(x+w / 2)
+        cY = int(y+h / 2)
+        center = (cX,cY)
+        cv2.circle(img, ((cX, cY)), 5, (0, 255, 255), -1)
+        cv2.circle(img, ((cX, cY)), 0, (255, 0, 255), -1)
+        center_pointsX.append(cX)
+        center_pointsY.append(cY)
+    if len(ocx) > 1:
+        for i in range(len(center_pointsX)):
+            cv2.circle(img, ((center_pointsX[i], center_pointsY[i])), 3, (255, 0, 255), -1)
+            cv2.line(img, (ocx[i], ocy[i]), (center_pointsX[i], center_pointsY[i]), (255, 255, 255), 5)
+    ocx = center_pointsX
+    ocy = center_pointsY
+    center_pointsX = []
+    center_pointsY = []
+
     # Расчет оптического потока
     if len(trajectories) > 0:
         img0, img1 = prev_gray, mask_eroded
@@ -101,6 +128,8 @@ while True:
     cv2.putText(img, f"{fps:.2f} FPS", (20, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
     cv2.imshow('final', img)
     cv2.imshow('mask', mask)
+    cv2.imshow('maskeroded', mask_eroded)
+
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break

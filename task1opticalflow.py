@@ -1,57 +1,64 @@
+
 import numpy as np
 import cv2
 
-cap_video = cv2.VideoCapture("232-video.mp4")
+# Èíèöèàëèçàöèÿ ôîíîâîãî âû÷èòàíèÿ
+backSub = cv2.createBackgroundSubtractorMOG2(history=500, varThreshold=100, detectShadows=True)
 
-feature_parameters = dict(maxCorners=100, qualityLevel=0.3, minDistance=7, blockSize=7)
+# Ñëîâàðü äëÿ îòñëåæèâàíèÿ ïóòåé
+paths = {}
 
-lk_parameters = dict(
-    winSize=(15, 15),
-    maxLevel=2,
-    criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03),
-)
+# Èíèöèàëèçàöèÿ âèäåîïîòîêà
+cap = cv2.VideoCapture("232-video.mp4")  # Èñïîëüçóåòñÿ êàìåðà; çàìåíèòå 0 íà 'path_to_video.mp4' äëÿ èñïîëüçîâàíèÿ âèäåîôàéëà
 
-random_color = np.random.randint(0, 255, (100, 3))
-
-ret, previous_frame = cap_video.read()
-previous_gray = cv2.cvtColor(previous_frame, cv2.COLOR_BGR2GRAY)
-p0_point = cv2.goodFeaturesToTrack(previous_gray, mask=None, **feature_parameters)
-
-mask_drawing = np.zeros_like(previous_frame)
-while 1:
-    ret, frame = cap_video.read()
+frame_idx = 0
+while True:
+    ret, frame = cap.read()
+    frame = cv2.resize(frame,(640,480))
     if not ret:
-        print("No frames available!")
         break
-    frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-    p1, st_d, error = cv2.calcOpticalFlowPyrLK(
-        previous_gray, frame_gray, p0_point, None, **lk_parameters
-    )
+    # Ôîíîâîå âû÷èòàíèå è ïîëó÷åíèå ìàñêè ïåðåäíèõ îáúåêòîâ
+    fgMask = backSub.apply(frame)
 
-    if p1 is not None:
-        good_new_point = p1[st_d == 1]
-        good_old_point = p0_point[st_d == 1]
+    # Óäàëåíèå øóìà è íåçíà÷èòåëüíûõ îáúåêòîâ
+    _, thresh = cv2.threshold(fgMask, 244, 255, cv2.THRESH_BINARY)
+    thresh = cv2.erode(thresh, None, iterations=2)
+    thresh = cv2.dilate(thresh, None, iterations=2)
 
-    for i, (new_point, old_point) in enumerate(zip(good_new_point, good_old_point)):
-        a, b = new_point.ravel()
-        c, d = old_point.ravel()
-        mask_drawing = cv2.line(
-            mask_drawing,
-            (int(a), int(b)),
-            (int(c), int(d)),
-            random_color[i].tolist(),
-            2,
-        )
-        frame = cv2.circle(frame, (int(a), int(b)), 5, random_color[i].tolist(), -1)
-    img = cv2.add(frame, mask_drawing)
-    cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
-    cv2.resizeWindow('frame', 700, 700)
-    cv2.imshow("frame", img)
+    # Ïîèñê êîíòóðîâ è îòñëåæèâàíèå îáúåêòîâ
+    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    for contour in contours:
+        if cv2.contourArea(contour) < 250:
+            continue
+        # Íàõîæäåíèå öåíòðà ìàññ êîíòóðà
+        M = cv2.moments(contour)
+        cx = int(M['m10']/M['m00'])
+        cy = int(M['m01']/M['m00'])
 
-    previous_gray = frame_gray.copy()
-    p0_point = good_new_point.reshape(-1, 1, 2)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+        # Îòñëåæèâàíèå ïóòè êàæäîãî îáúåêòà
+        if frame_idx not in paths:
+            paths[frame_idx] = [(cx, cy)]
+        else:
+            paths[frame_idx].append((cx, cy))
+
+        frame_idx += 1
+
+    # Ðèñîâàíèå òðàåêòîðèé
+    for path in paths.values():
+        for i in range(1, len(path)):
+            if path[i - 1] is None or path[i] is None:
+                continue
+            cv2.line(frame, path[i - 1], path[i], (0, 255, 0), 2)
+
+    # Îòîáðàæåíèå ðåçóëüòàòà
+    cv2.imshow('Frame', frame)
+    cv2.imshow('FG Mask', fgMask)
+
+    keyboard = cv2.waitKey(30)
+    if keyboard == 'q' or keyboard == 27:
         break
-cap_video.release()
+
+# Î÷èñòêà ðåñóðñîâ
+cap.release()
 cv2.destroyAllWindows()
