@@ -1,7 +1,3 @@
-import math
-from collections import deque
-from random import random
-
 import cv2
 import numpy as np
 import time
@@ -17,7 +13,7 @@ feature_params = dict(maxCorners=30,
                       minDistance=10,
                       blockSize=5)
 
-trajectory_len = 40000
+trajectory_len = 40
 detect_interval = 2
 trajectories = []
 frame_idx = 0
@@ -26,16 +22,11 @@ cap = cv2.VideoCapture('232-video.mp4')
 
 SMOOTHING_WINDOW_SIZE = 5
 
-blank = np.zeros((480,640,3),dtype=np.uint8)
 
 # ip cam addres http://192.168.217.103/mjpg/video.mjpg
 backSub = cv2.createBackgroundSubtractorMOG2()
-center_pointsX = 0
-center_pointsY = 0
 cX = 0
 cY = 0
-ocx = 0
-ocy = 0
 new_tracks = {}
 tracks = {}
 
