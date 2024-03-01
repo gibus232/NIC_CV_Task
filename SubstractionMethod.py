@@ -22,9 +22,9 @@ detect_interval = 2
 trajectories = []
 frame_idx = 0
 points = []
-cap = cv2.VideoCapture('230-video.mp4')
+cap = cv2.VideoCapture('232-video.mp4')
 
-
+SMOOTHING_WINDOW_SIZE = 5
 
 blank = np.zeros((480,640,3),dtype=np.uint8)
 
@@ -38,6 +38,16 @@ ocx = 0
 ocy = 0
 new_tracks = {}
 tracks = {}
+
+def smooth_trajectory(points, window_size):
+    if len(points) < window_size:
+        return points
+    else:
+        smoothed_points = []
+        for i in range(len(points) - window_size + 1):
+            smoothed_point = np.mean(points[i:i+window_size], axis=0)
+            smoothed_points.append(tuple(smoothed_point.astype(int)))
+        return smoothed_points
 while True:
 
 
@@ -77,25 +87,25 @@ while True:
 
         match_found = None
         for track_id, points in tracks.items():
-            # Если точка близка к последней точке трека, считаем, что это соответствие
+            # Если точка близка к последней точке, считаем, что это соответствие
             if np.linalg.norm(np.array(points[-1]) - np.array((cX, cY))) < 50:
                 match_found = track_id
                 break
 
-        # Обновляем или создаем трек
         if match_found is not None:
             new_tracks[match_found] = tracks[match_found] + [(cX, cY)]
-            del tracks[match_found]  # Удаляем старый трек, чтобы не дублировать
+            del tracks[match_found]
         else:
             new_tracks[len(new_tracks)] = [(cX, cY)]
     tracks.update(new_tracks)
 
     # Рисуем траектории
+
     for points in tracks.values():
-        for i in range(1, len(points)):
-            cv2.line(img, points[i - 1], points[i], (0, 0, 255), 2)
-    center_pointsX = []
-    center_pointsY = []
+        smoothed_points = smooth_trajectory(points, SMOOTHING_WINDOW_SIZE)
+        for i in range(1, len(smoothed_points)):
+            # cv2.line(img, points[i - 1], points[i], (0, 0, 255), 2)
+            cv2.line(img, smoothed_points[i - 1], smoothed_points[i], (0, 0, 255), 2)
 
     # Расчет оптического потока
     if len(trajectories) > 0:
