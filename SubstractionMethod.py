@@ -17,12 +17,12 @@ feature_params = dict(maxCorners=30,
                       minDistance=10,
                       blockSize=5)
 
-trajectory_len = 400
+trajectory_len = 40000
 detect_interval = 2
 trajectories = []
 frame_idx = 0
 points = []
-cap = cv2.VideoCapture('232-video.mp4')
+cap = cv2.VideoCapture('230-video.mp4')
 
 
 
@@ -36,7 +36,8 @@ cX = 0
 cY = 0
 ocx = 0
 ocy = 0
-pointsDict = {'cnt num':'points'}
+new_tracks = {}
+tracks = {}
 while True:
 
 
@@ -63,23 +64,36 @@ while True:
     countours, _ = cv2.findContours(mask_eroded, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     img = frame_out.copy()
-    for countour in countours:
+    for i,countour in enumerate(countours):
         if cv2.contourArea(countour) < 6500:
             continue
-        maxc = max(countours, key = cv2.contourArea)
-        (x, y, w, h) = cv2.boundingRect(maxc)
+
+        (x, y, w, h) = cv2.boundingRect(countour)
         cv2.rectangle(img, (x,y), (x+w,y+h), (0, 0, 255), 2)
         cX = int(x+w / 2)
         cY = int(y+h / 2)
         center = (cX,cY)
         cv2.circle(img, (cX, cY), 5, (0, 255, 255), -1)
 
-    if ocx !=0 and ocx:
-        cv2.line(blank, (ocx, ocy), (cX, cY), (255, 255, 255), 5)
-    img = cv2.add(blank,img)
-    ocx = cX
-    ocy = cY
+        match_found = None
+        for track_id, points in tracks.items():
+            # Если точка близка к последней точке трека, считаем, что это соответствие
+            if np.linalg.norm(np.array(points[-1]) - np.array((cX, cY))) < 50:
+                match_found = track_id
+                break
 
+        # Обновляем или создаем трек
+        if match_found is not None:
+            new_tracks[match_found] = tracks[match_found] + [(cX, cY)]
+            del tracks[match_found]  # Удаляем старый трек, чтобы не дублировать
+        else:
+            new_tracks[len(new_tracks)] = [(cX, cY)]
+    tracks.update(new_tracks)
+
+    # Рисуем траектории
+    for points in tracks.values():
+        for i in range(1, len(points)):
+            cv2.line(img, points[i - 1], points[i], (0, 0, 255), 2)
     center_pointsX = []
     center_pointsY = []
 
