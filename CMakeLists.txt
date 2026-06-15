@@ -34,6 +34,7 @@ qt_add_qml_module(FamilyBudget
     URI FamilyBudget
     VERSION 1.0
     NO_LINT
+    NO_CACHEGEN
     QML_FILES
         qml/main.qml
         qml/screens/LoginScreen.qml
