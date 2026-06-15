@@ -5,16 +5,20 @@ on:
     tags:
       - 'v*.*.*'
 
+env:
+  QT_VERSION: '6.7.2'
+  QT_DIR: ${{ github.workspace }}/Qt
+
 jobs:
   release:
-    name: Build & Release
+    name: Build & Release APK
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Extract version from tag
+      - name: Extract version
         id: version
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
@@ -24,84 +28,84 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y ninja-build cmake
 
-      - name: Install Qt for Android
+      - name: Install Qt (Linux host tools)
         uses: jurplel/install-qt-action@v4
         with:
-          version: '6.7.2'
-          host: 'linux'
-          target: 'android'
-          arch: 'android_arm64_v8a'
-          modules: 'qtcharts'
-          cache: true
-
-      - name: Install Qt host tools
-        uses: jurplel/install-qt-action@v4
-        with:
-          version: '6.7.2'
-          host: 'linux'
-          target: 'desktop'
-          arch: 'linux_gcc_64'
-          modules: 'qtcharts'
+          version: ${{ env.QT_VERSION }}
+          host: linux
+          target: desktop
+          arch: linux_gcc_64
+          modules: qtcharts
+          dir: ${{ env.QT_DIR }}
           cache: true
           set-env: false
-          dir: '${{ github.workspace }}/qt_host'
 
-      - name: Set up Ninja
-        run: sudo apt-get install -y ninja-build
+      - name: Install Qt (Android arm64)
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          host: linux
+          target: android
+          arch: android_arm64_v8a
+          modules: qtcharts
+          dir: ${{ env.QT_DIR }}
+          cache: true
+          set-env: false
 
-      - name: Configure (Release)
-        env:
-          ANDROID_NDK_ROOT: ${{ env.ANDROID_NDK_ROOT }}
+      - name: Install Android NDK
+        run: |
+          NDK_VERSION="27.2.12479018"
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "ndk;${NDK_VERSION}" --channel=0
+          echo "ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/${NDK_VERSION}" >> $GITHUB_ENV
+
+      - name: Set Qt paths
+        run: |
+          echo "QT_HOST_QT=${{ env.QT_DIR }}/${{ env.QT_VERSION }}/gcc_64" >> $GITHUB_ENV
+          echo "QT_ANDROID_QT=${{ env.QT_DIR }}/${{ env.QT_VERSION }}/android_arm64_v8a" >> $GITHUB_ENV
+
+      - name: Configure CMake
         run: |
           cmake -B build-release \
-            -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake \
+            -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake" \
             -DANDROID_ABI=arm64-v8a \
             -DANDROID_PLATFORM=android-24 \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_PREFIX_PATH=$Qt6_DIR \
-            -DQT_HOST_PATH=${{ github.workspace }}/qt_host/Qt/6.7.2/gcc_64 \
-            -DCMAKE_ANDROID_STL_TYPE=c++_shared \
+            -DCMAKE_PREFIX_PATH="$QT_ANDROID_QT" \
+            -DQT_HOST_PATH="$QT_HOST_QT" \
+            -DQT_HOST_PATH_CMAKE_DIR="$QT_HOST_QT/lib/cmake" \
+            -DANDROID_STL=c++_shared \
             -GNinja
 
-      - name: Build release APK
+      - name: Build
         run: |
-          cmake --build build-release --parallel
+          cmake --build build-release --parallel $(nproc)
           cmake --build build-release --target apk
 
-      - name: Find APK
-        id: find_apk
+      - name: Collect APK
         run: |
           APK=$(find build-release -name '*.apk' | head -1)
-          echo "APK_PATH=$APK" >> $GITHUB_OUTPUT
           cp "$APK" FamilyBudget-${{ steps.version.outputs.VERSION }}.apk
 
-      - name: Create GitHub Release
+      - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           name: "Family Budget v${{ steps.version.outputs.VERSION }}"
           body: |
             ## 📱 Семейный Бюджет v${{ steps.version.outputs.VERSION }}
 
-            ### Что нового
-            - 👨‍👩‍👧‍👦 Несколько аккаунтов для членов семьи
-            - 🔒 PIN-защита аккаунтов
-            - 💰 Контроль доходов и расходов
-            - 📈 Отчёты с диаграммами
-            - 📅 Бюджетирование по категориям
-            - 🎨 Стиль Frutiger Aero (2010-2016)
+            **Требования:** Android 7.0+ (API 24), arm64-v8a
 
             ### Установка
             1. Скачайте APK
-            2. Разрешите установку из неизвестных источников (в настройках андроида)
+            2. Разрешите установку из неизвестных источников
             3. Установите
-
-            **Требования:** Android 7.0+ (API 24)
           files: FamilyBudget-${{ steps.version.outputs.VERSION }}.apk
           draft: false
           prerelease: false
-          generate_release_notes: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
