@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("userManager", &userManager);
     engine.rootContext()->setContextProperty("budgetManager", &budgetManager);
 
-    const QUrl url(u"qrc:/qt/qml/FamilyBudget/qml/main.qml"_qs);
+    const QUrl url(QStringLiteral("qrc:/qt/qml/FamilyBudget/qml/main.qml"));
     QObject::connect(
         &engine, &QQmlApplicationEngine::objectCreationFailed,
         &app, []() { QCoreApplication::exit(-1); },
