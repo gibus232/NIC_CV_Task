@@ -163,6 +163,12 @@ Item {
         }
     }
 
+    Component { id: txComp;     TransactionsScreen  {} }
+    Component { id: budgetComp; BudgetScreen        {} }
+    Component { id: reportsComp; ReportsScreen      {} }
+    Component { id: familyComp; FamilyScreen        {} }
+    Component { id: addTxComp;  AddTransactionScreen {} }
+
     // Tab content loader
     StackLayout {
         id: tabs
@@ -170,10 +176,10 @@ Item {
         currentIndex: bottomNav.currentIndex
 
         Loader { active: tabs.currentIndex === 0; sourceComponent: homeComp }
-        Loader { active: tabs.currentIndex === 1; source: "TransactionsScreen.qml" }
-        Loader { active: tabs.currentIndex === 2; source: "BudgetScreen.qml" }
-        Loader { active: tabs.currentIndex === 3; source: "ReportsScreen.qml" }
-        Loader { active: tabs.currentIndex === 4; source: "FamilyScreen.qml" }
+        Loader { active: tabs.currentIndex === 1; sourceComponent: txComp }
+        Loader { active: tabs.currentIndex === 2; sourceComponent: budgetComp }
+        Loader { active: tabs.currentIndex === 3; sourceComponent: reportsComp }
+        Loader { active: tabs.currentIndex === 4; sourceComponent: familyComp }
     }
 
     // FAB – add transaction
@@ -203,7 +209,7 @@ Item {
 
         MouseArea {
             id: fabMa; anchors.fill: parent
-            onClicked: StackView.view.push(Qt.resolvedUrl("AddTransactionScreen.qml"))
+            onClicked: StackView.view.push(addTxComp)
         }
     }
 

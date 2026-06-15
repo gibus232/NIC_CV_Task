@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import FamilyBudget
 
 ApplicationWindow {
     id: root
@@ -40,12 +41,13 @@ ApplicationWindow {
         }
     }
 
+    Component { id: loginComp;     LoginScreen     {} }
+    Component { id: dashboardComp; DashboardScreen {} }
+
     StackView {
         id: stackView
         anchors.fill: parent
-        initialItem: userManager.isLoggedIn
-            ? Qt.resolvedUrl("screens/DashboardScreen.qml")
-            : Qt.resolvedUrl("screens/LoginScreen.qml")
+        initialItem: userManager.isLoggedIn ? dashboardComp : loginComp
 
         pushEnter:    Transition { NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 320; easing.type: Easing.OutCubic } }
         pushExit:     Transition { NumberAnimation { property: "opacity"; from: 1; to: 0; duration: 200 } }
@@ -59,9 +61,9 @@ ApplicationWindow {
         target: userManager
         function onCurrentUserChanged() {
             if (userManager.isLoggedIn)
-                stackView.replace(Qt.resolvedUrl("screens/DashboardScreen.qml"))
+                stackView.replace(dashboardComp)
             else
-                stackView.replace(Qt.resolvedUrl("screens/LoginScreen.qml"))
+                stackView.replace(loginComp)
         }
     }
 }
