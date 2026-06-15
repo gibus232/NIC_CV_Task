@@ -119,12 +119,12 @@ Item {
                 Rectangle {
                     width: parent.width; height: 46; radius: 12
                     color: Qt.rgba(1,1,1,0.10); border.color: Qt.rgba(1,1,1,0.22); border.width: 1
-                    TextInput {
-                        anchors.fill: parent; anchors.leftMargin: 14; anchors.rightMargin: 14
-                        verticalAlignment: TextInput.AlignVCenter
+                    TextField {
+                        anchors.fill: parent; leftPadding: 14; rightPadding: 14
                         placeholderText: "Необязательно..."
                         color: "white"; font.pixelSize: 15
                         onTextChanged: root.note = text
+                        background: null
                     }
                 }
             }

@@ -211,13 +211,13 @@ Item {
             Rectangle {
                 width: parent.width - 48; height: 46; radius: 12; anchors.horizontalCenter: parent.horizontalCenter
                 color: Qt.rgba(1,1,1,0.10); border.color: Qt.rgba(1,1,1,0.25); border.width: 1
-                TextInput { id: nameIn; anchors.fill: parent; anchors.leftMargin: 14; anchors.rightMargin: 14; verticalAlignment: TextInput.AlignVCenter; color: "white"; font.pixelSize: 15; placeholderText: "Имя"}
+                TextField { id: nameIn; anchors.fill: parent; leftPadding: 14; rightPadding: 14; color: "white"; font.pixelSize: 15; placeholderText: "Имя"; background: null }
             }
 
             Rectangle {
                 width: parent.width - 48; height: 46; radius: 12; anchors.horizontalCenter: parent.horizontalCenter
                 color: Qt.rgba(1,1,1,0.10); border.color: Qt.rgba(1,1,1,0.25); border.width: 1
-                TextInput { id: pinIn; anchors.fill: parent; anchors.leftMargin: 14; anchors.rightMargin: 14; verticalAlignment: TextInput.AlignVCenter; color: "white"; font.pixelSize: 15; echoMode: TextInput.Password; inputMethodHints: Qt.ImhDigitsOnly; maximumLength: 4; placeholderText: "PIN (необязательно)"}
+                TextField { id: pinIn; anchors.fill: parent; leftPadding: 14; rightPadding: 14; color: "white"; font.pixelSize: 15; echoMode: TextField.Password; inputMethodHints: Qt.ImhDigitsOnly; maximumLength: 4; placeholderText: "PIN (необязательно)"; background: null }
             }
 
             Text { text: "Цвет аватара:"; color: Qt.rgba(1,1,1,0.65); font.pixelSize: 13 }
