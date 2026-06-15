@@ -34,7 +34,7 @@ jobs:
           host: 'linux'
           target: 'android'
           arch: 'android_arm64_v8a'
-          modules: 'qtcharts qtsvg'
+          modules: 'qtcharts'
           cache: true
 
       - name: Install Qt host tools
@@ -44,15 +44,13 @@ jobs:
           host: 'linux'
           target: 'desktop'
           arch: 'linux_gcc_64'
-          modules: 'qtcharts qtsvg'
+          modules: 'qtcharts'
           cache: true
           set-env: false
           dir: '${{ github.workspace }}/qt_host'
 
-      - name: Set up CMake & Ninja
-        run: |
-          sudo apt-get install -y ninja-build
-          pip install cmake --upgrade
+      - name: Set up Ninja
+        run: sudo apt-get install -y ninja-build
 
       - name: Configure (Release)
         env:

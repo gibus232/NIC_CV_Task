@@ -16,7 +16,6 @@ find_package(Qt6 6.4 REQUIRED COMPONENTS
     QuickControls2
     Sql
     Charts
-    Svg
 )
 
 qt_standard_project_setup()
@@ -75,5 +74,4 @@ target_link_libraries(FamilyBudget PRIVATE
     Qt6::QuickControls2
     Qt6::Sql
     Qt6::Charts
-    Qt6::Svg
 )

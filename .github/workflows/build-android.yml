@@ -32,7 +32,7 @@ jobs:
           host: 'linux'
           target: 'android'
           arch: 'android_arm64_v8a'
-          modules: 'qtcharts qtsvg'
+          modules: 'qtcharts'
           cache: true
 
       - name: Install Qt for Linux host
@@ -42,15 +42,10 @@ jobs:
           host: 'linux'
           target: 'desktop'
           arch: 'linux_gcc_64'
-          modules: 'qtcharts qtsvg'
+          modules: 'qtcharts'
           cache: true
           set-env: false
           dir: '${{ github.workspace }}/qt_host'
-
-      - name: Set up CMake
-        uses: jwlawson/actions-setup-cmake@v2
-        with:
-          cmake-version: '3.27'
 
       - name: Set up Ninja
         run: sudo apt-get install -y ninja-build
@@ -72,8 +67,7 @@ jobs:
         run: cmake --build build-android --parallel
 
       - name: Create APK
-        run: |
-          cmake --build build-android --target apk
+        run: cmake --build build-android --target apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
