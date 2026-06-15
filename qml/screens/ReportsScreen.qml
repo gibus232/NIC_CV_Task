@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtCharts
-import "../components"
+import FamilyBudget
 
 Item {
     id: root
