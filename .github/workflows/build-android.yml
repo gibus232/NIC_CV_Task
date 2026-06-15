@@ -45,26 +45,32 @@ jobs:
         run: |
           echo "QT_ROOT_DIR=$QT_ROOT_DIR"
           echo "QT_HOST_PATH=$QT_HOST_PATH"
-          echo "Qt6_DIR=$Qt6_DIR"
           echo "ANDROID_NDK_ROOT=$ANDROID_NDK_ROOT"
-          ls "$QT_ROOT_DIR/lib/cmake/Qt6" 2>/dev/null | head -5 || echo "Qt6 cmake dir not at expected path"
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          ls "$QT_ROOT_DIR/bin/qt-cmake" 2>/dev/null && echo "qt-cmake found" || echo "qt-cmake NOT found"
+          ls "$QT_ROOT_DIR/lib/cmake/Qt6/Qt6Config.cmake" 2>/dev/null && echo "Qt6Config.cmake found" || echo "Qt6Config.cmake NOT found"
+          ls "$QT_ROOT_DIR/lib/cmake/Qt6/qt.toolchain.cmake" 2>/dev/null && echo "qt.toolchain.cmake found" || echo "qt.toolchain.cmake NOT found"
 
       - name: Configure CMake
         run: |
-          cmake -B build-android \
-            -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake" \
+          # Use Qt's qt.toolchain.cmake which correctly sets CMAKE_FIND_ROOT_PATH_MODE_PACKAGE=BOTH
+          # This avoids the NDK toolchain's ONLY mode that blocks Qt discovery
+          $QT_ROOT_DIR/bin/qt-cmake -B build-android \
             -DANDROID_ABI=arm64-v8a \
             -DANDROID_PLATFORM=android-24 \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_PREFIX_PATH="$QT_ROOT_DIR" \
+            -DCMAKE_BUILD_TYPE=Debug \
             -DQT_HOST_PATH="$QT_HOST_PATH" \
+            -DANDROID_SDK_ROOT="$ANDROID_HOME" \
+            -DANDROID_NDK_ROOT="$ANDROID_NDK_ROOT" \
             -GNinja
 
       - name: Build
         run: cmake --build build-android --parallel $(nproc)
 
       - name: Package APK
-        run: cmake --build build-android --target apk
+        run: |
+          cmake --build build-android --target apk
+          find build-android -name "*.apk" | head -20
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
