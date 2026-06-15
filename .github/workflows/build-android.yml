@@ -43,6 +43,16 @@ jobs:
             "platforms;android-34" \
             "build-tools;34.0.0"
           echo "ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/${NDK}" >> $GITHUB_ENV
+          # The runner ships preview platforms (android-35/36-ext*) whose
+          # android.jar is in a format the bundled aapt2 cannot parse:
+          #   "RES_TABLE_TYPE_TYPE entry offsets overlap actual entry data"
+          # androiddeployqt auto-selects the NEWEST installed platform, so we
+          # remove everything newer than 34 to force a working compileSdk.
+          echo "Platforms before cleanup:"; ls "$ANDROID_HOME/platforms" || true
+          for p in "$ANDROID_HOME"/platforms/android-3[5-9]*; do
+            [ -e "$p" ] && sudo rm -rf "$p" && echo "Removed $p"
+          done
+          echo "Platforms after cleanup:"; ls "$ANDROID_HOME/platforms" || true
 
       - name: Debug Qt paths
         run: |
