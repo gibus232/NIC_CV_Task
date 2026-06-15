@@ -7,7 +7,7 @@ Item {
 
     AeroHeader {
         id: hdr
-        anchors { top: parent.top; left: parent.left; right: parent.right }
+        anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right
         title: "Семья"
         showAction: true; actionIcon: "+"
         onActionClicked: addPopup.open()
@@ -15,7 +15,7 @@ Item {
 
     ListView {
         id: userList
-        anchors { top: hdr.bottom; topMargin: 12; bottom: parent.bottom; bottomMargin: 8; left: parent.left; leftMargin: 16; right: parent.right; rightMargin: 16 }
+        anchors.top: hdr.bottom; anchors.topMargin: 12; anchors.bottom: parent.bottom; anchors.bottomMargin: 8; anchors.left: parent.left; anchors.leftMargin: 16; anchors.right: parent.right; anchors.rightMargin: 16
         spacing: 12; clip: true
         model: userManager.getUsers()
 
@@ -26,17 +26,19 @@ Item {
             border.width: 1
 
             Rectangle {
-                anchors { top: parent.top; left: parent.left; right: parent.right; margins: 1 }
+                anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right; anchors.margins: 1
                 height: parent.height * 0.45; radius: parent.radius
-                gradient: Gradient { GradientStop { position: 0.0; color: Qt.rgba(1,1,1,0.08) }; GradientStop { position: 1.0; color: Qt.rgba(1,1,1,0.00) } }
+                gradient: Gradient { GradientStop { position: 0.0; color: Qt.rgba(1,1,1,0.08) }
+                        GradientStop { position: 1.0; color: Qt.rgba(1,1,1,0.00) } }
             }
 
             Row {
-                anchors { fill: parent; leftMargin: 16; rightMargin: 16 }; spacing: 14
+                anchors.fill: parent; anchors.leftMargin: 16; anchors.rightMargin: 16; spacing: 14
 
                 Rectangle {
                     width: 56; height: 56; radius: 28; anchors.verticalCenter: parent.verticalCenter
-                    gradient: Gradient { GradientStop { position: 0.0; color: Qt.lighter(modelData.color||"#1565C0",1.4) }; GradientStop { position: 1.0; color: modelData.color||"#1565C0" } }
+                    gradient: Gradient { GradientStop { position: 0.0; color: Qt.lighter(modelData.color||"#1565C0",1.4) }
+                        GradientStop { position: 1.0; color: modelData.color||"#1565C0" } }
                     border.color: Qt.rgba(1,1,1,0.45); border.width: 2
                     Text { anchors.centerIn: parent; text: (modelData.name||"?")[0].toUpperCase(); color: "white"; font.pixelSize: 24; font.weight: Font.Bold }
                 }
@@ -82,22 +84,26 @@ Item {
         onOpened: { nameIn.text = ""; pinIn.text = ""; chosenColor = "#1565C0" }
         property string chosenColor: "#1565C0"
 
-        background: Rectangle { radius: 24; color: Qt.rgba(0.05,0.10,0.25,0.96); border.color: Qt.rgba(1,1,1,0.30); border.width: 1; Rectangle { anchors { top: parent.top; left: parent.left; right: parent.right; margins: 1 }; height: 48; radius: parent.radius; gradient: Gradient { GradientStop { position: 0.0; color: Qt.rgba(1,1,1,0.12) }; GradientStop { position: 1.0; color: Qt.rgba(1,1,1,0.00) } } } }
+        background: Rectangle { radius: 24; color: Qt.rgba(0.05,0.10,0.25,0.96); border.color: Qt.rgba(1,1,1,0.30); border.width: 1; Rectangle { anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right; anchors.margins: 1; height: 48; radius: parent.radius; gradient: Gradient { GradientStop { position: 0.0; color: Qt.rgba(1,1,1,0.12) }
+                        GradientStop { position: 1.0; color: Qt.rgba(1,1,1,0.00) } } } }
         Overlay.modal: Rectangle { color: Qt.rgba(0,0,0,0.60) }
 
         Column {
             width: parent.width; spacing: 14; padding: 24
             Text { anchors.horizontalCenter: parent.horizontalCenter; text: "Новый член семьи"; color: "white"; font.pixelSize: 18; font.weight: Font.Medium }
-            Rectangle { width: parent.width-48; height: 46; radius: 12; anchors.horizontalCenter: parent.horizontalCenter; color: Qt.rgba(1,1,1,0.10); border.color: Qt.rgba(1,1,1,0.25); border.width: 1; TextInput { id: nameIn; anchors { fill: parent; leftMargin: 14; rightMargin: 14 }; verticalAlignment: TextInput.AlignVCenter; color: "white"; font.pixelSize: 15; placeholderText: "Имя"; placeholderTextColor: Qt.rgba(1,1,1,0.38) } }
-            Rectangle { width: parent.width-48; height: 46; radius: 12; anchors.horizontalCenter: parent.horizontalCenter; color: Qt.rgba(1,1,1,0.10); border.color: Qt.rgba(1,1,1,0.25); border.width: 1; TextInput { id: pinIn; anchors { fill: parent; leftMargin: 14; rightMargin: 14 }; verticalAlignment: TextInput.AlignVCenter; color: "white"; font.pixelSize: 15; echoMode: TextInput.Password; inputMethodHints: Qt.ImhDigitsOnly; maximumLength: 4; placeholderText: "PIN (необязательно)"; placeholderTextColor: Qt.rgba(1,1,1,0.38) } }
+            Rectangle { width: parent.width-48; height: 46; radius: 12; anchors.horizontalCenter: parent.horizontalCenter; color: Qt.rgba(1,1,1,0.10); border.color: Qt.rgba(1,1,1,0.25); border.width: 1; TextInput { id: nameIn; anchors.fill: parent; anchors.leftMargin: 14; anchors.rightMargin: 14; verticalAlignment: TextInput.AlignVCenter; color: "white"; font.pixelSize: 15; placeholderText: "Имя"; placeholderTextColor: Qt.rgba(1,1,1,0.38) } }
+            Rectangle { width: parent.width-48; height: 46; radius: 12; anchors.horizontalCenter: parent.horizontalCenter; color: Qt.rgba(1,1,1,0.10); border.color: Qt.rgba(1,1,1,0.25); border.width: 1; TextInput { id: pinIn; anchors.fill: parent; anchors.leftMargin: 14; anchors.rightMargin: 14; verticalAlignment: TextInput.AlignVCenter; color: "white"; font.pixelSize: 15; echoMode: TextInput.Password; inputMethodHints: Qt.ImhDigitsOnly; maximumLength: 4; placeholderText: "PIN (необязательно)"; placeholderTextColor: Qt.rgba(1,1,1,0.38) } }
             Text { text: "Цвет:"; color: Qt.rgba(1,1,1,0.65); font.pixelSize: 13 }
             Flow { width: parent.width-48; anchors.horizontalCenter: parent.horizontalCenter; spacing: 10
                 Repeater { model: ["#F44336","#E91E63","#9C27B0","#3F51B5","#2196F3","#00BCD4","#4CAF50","#FF9800","#795548","#607D8B"]
                     delegate: Rectangle { width: 36; height: 36; radius: 18; color: modelData; border.color: addPopup.chosenColor===modelData?"white":"transparent"; border.width: 3; MouseArea { anchors.fill: parent; onClicked: addPopup.chosenColor=modelData } } }
             }
             Row { anchors.horizontalCenter: parent.horizontalCenter; spacing: 12
-                Rectangle { width: 100; height: 44; radius: 22; color: Qt.rgba(1,1,1,0.10); border.color: Qt.rgba(1,1,1,0.20); border.width: 1; Text { anchors.centerIn: parent; text: "Отмена"; color: "white"; font.pixelSize: 14 }; MouseArea { anchors.fill: parent; onClicked: addPopup.close() } }
-                Rectangle { width: 130; height: 44; radius: 22; gradient: Gradient { orientation: Gradient.Horizontal; GradientStop { position: 0.0; color: "#1E88E5" }; GradientStop { position: 1.0; color: "#1565C0" } }; border.color: Qt.rgba(1,1,1,0.35); border.width: 1
+                Rectangle { width: 100; height: 44; radius: 22; color: Qt.rgba(1,1,1,0.10); border.color: Qt.rgba(1,1,1,0.20); border.width: 1; Text { anchors.centerIn: parent; text: "Отмена"; color: "white"; font.pixelSize: 14 }
+                        MouseArea { anchors.fill: parent; onClicked: addPopup.close() } }
+                Rectangle { width: 130; height: 44; radius: 22; gradient: Gradient { orientation: Gradient.Horizontal; GradientStop { position: 0.0; color: "#1E88E5" }
+                        GradientStop { position: 1.0; color: "#1565C0" } }
+                    border.color: Qt.rgba(1,1,1,0.35); border.width: 1
                     Text { anchors.centerIn: parent; text: "Добавить"; color: "white"; font.pixelSize: 14; font.weight: Font.Medium }
                     MouseArea { anchors.fill: parent; onClicked: { var n=nameIn.text.trim(); if(n!==""){ userManager.createUser(n,pinIn.text,addPopup.chosenColor,"person"); addPopup.close() } } }
                 }

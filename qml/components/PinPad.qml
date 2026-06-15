@@ -41,7 +41,7 @@ Item {
 
                     Rectangle {
                         visible: modelData !== ""
-                        anchors { top: parent.top; left: parent.left; right: parent.right; margins: 1 }
+                        anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right; anchors.margins: 1
                         height: parent.height * 0.45; radius: parent.radius
                         gradient: Gradient {
                             GradientStop { position: 0.0; color: Qt.rgba(1,1,1,0.12) }

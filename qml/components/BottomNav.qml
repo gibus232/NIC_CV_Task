@@ -9,7 +9,7 @@ Rectangle {
     color: Qt.rgba(0.02, 0.06, 0.18, 0.92)
 
     Rectangle {
-        anchors { top: parent.top; left: parent.left; right: parent.right }
+        anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right
         height: 1
         color: Qt.rgba(1, 1, 1, 0.20)
     }
@@ -31,7 +31,7 @@ Rectangle {
                 height: parent.height
 
                 Rectangle {
-                    anchors { fill: parent; margins: 4 }
+                    anchors.fill: parent; anchors.margins: 4
                     radius: 12
                     color: root.currentIndex === index
                            ? Qt.rgba(0.3, 0.65, 1.0, 0.18) : "transparent"

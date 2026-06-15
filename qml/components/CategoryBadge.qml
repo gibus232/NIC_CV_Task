@@ -16,7 +16,7 @@ Rectangle {
     Behavior on color { ColorAnimation { duration: 150 } }
 
     Rectangle {
-        anchors { top: parent.top; left: parent.left; right: parent.right; margins: 1 }
+        anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right; anchors.margins: 1
         height: parent.height * 0.48; radius: parent.radius
         gradient: Gradient {
             GradientStop { position: 0.0; color: root.selected ? Qt.rgba(1,1,1,0.22) : Qt.rgba(1,1,1,0.07) }

@@ -16,7 +16,7 @@ Rectangle {
     border.width: 1
 
     Column {
-        anchors { fill: parent; margins: 14 }
+        anchors.fill: parent; anchors.margins: 14
         spacing: 8
 
         Row {
@@ -46,7 +46,7 @@ Rectangle {
                 color: root.overBudget ? "#EF5350" : root.barColor
 
                 Rectangle {
-                    anchors { top: parent.top; left: parent.left; right: parent.right; margins: 0 }
+                    anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right; anchors.margins: 0
                     height: parent.height / 2; radius: parent.radius
                     color: Qt.rgba(1,1,1,0.35)
                 }

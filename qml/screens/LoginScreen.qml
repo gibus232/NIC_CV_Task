@@ -9,7 +9,7 @@ Item {
 
     // ---- Logo & title ----
     Column {
-        anchors { top: parent.top; topMargin: 64; horizontalCenter: parent.horizontalCenter }
+        anchors.top: parent.top; anchors.topMargin: 64; anchors.horizontalCenter: parent.horizontalCenter
         spacing: 10
 
         Rectangle {
@@ -22,7 +22,7 @@ Item {
             border.color: Qt.rgba(1,1,1,0.45); border.width: 2
 
             Rectangle {
-                anchors { top: parent.top; left: parent.left; right: parent.right; margins: 1 }
+                anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right; anchors.margins: 1
                 height: parent.height * 0.48; radius: parent.radius
                 gradient: Gradient {
                     GradientStop { position: 0.0; color: Qt.rgba(1,1,1,0.30) }
@@ -39,7 +39,7 @@ Item {
     // ---- User list ----
     ListView {
         id: userList
-        anchors { top: parent.top; topMargin: 230; bottom: addBtn.top; bottomMargin: 16; left: parent.left; leftMargin: 20; right: parent.right; rightMargin: 20 }
+        anchors.top: parent.top; anchors.topMargin: 230; anchors.bottom: addBtn.top; anchors.bottomMargin: 16; anchors.left: parent.left; anchors.leftMargin: 20; anchors.right: parent.right; anchors.rightMargin: 20
         spacing: 12; clip: true
         model: userManager.getUsers()
 
@@ -49,7 +49,7 @@ Item {
             border.color: Qt.rgba(1,1,1,0.22); border.width: 1
 
             Rectangle {
-                anchors { top: parent.top; left: parent.left; right: parent.right; margins: 1 }
+                anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right; anchors.margins: 1
                 height: parent.height * 0.45; radius: parent.radius
                 gradient: Gradient {
                     GradientStop { position: 0.0; color: Qt.rgba(1,1,1,0.10) }
@@ -58,7 +58,7 @@ Item {
             }
 
             Row {
-                anchors { fill: parent; leftMargin: 16; rightMargin: 16 }; spacing: 14
+                anchors.fill: parent; anchors.leftMargin: 16; anchors.rightMargin: 16; spacing: 14
 
                 Rectangle {
                     width: 52; height: 52; radius: 26
@@ -99,7 +99,7 @@ Item {
     // ---- Add account button ----
     Rectangle {
         id: addBtn
-        anchors { bottom: parent.bottom; bottomMargin: 44; horizontalCenter: parent.horizontalCenter }
+        anchors.bottom: parent.bottom; anchors.bottomMargin: 44; anchors.horizontalCenter: parent.horizontalCenter
         width: 240; height: 52; radius: 26
         gradient: Gradient {
             orientation: Gradient.Horizontal
@@ -109,7 +109,7 @@ Item {
         border.color: Qt.rgba(1,1,1,0.35); border.width: 1
 
         Rectangle {
-            anchors { top: parent.top; left: parent.left; right: parent.right; margins: 1 }
+            anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right; anchors.margins: 1
             height: parent.height * 0.50; radius: parent.radius
             gradient: Gradient {
                 GradientStop { position: 0.0; color: Qt.rgba(1,1,1,0.25) }
@@ -137,7 +137,7 @@ Item {
             radius: 24; color: Qt.rgba(0.05,0.10,0.25,0.96)
             border.color: Qt.rgba(1,1,1,0.30); border.width: 1
             Rectangle {
-                anchors { top: parent.top; left: parent.left; right: parent.right; margins: 1 }
+                anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right; anchors.margins: 1
                 height: 48; radius: parent.radius
                 gradient: Gradient {
                     GradientStop { position: 0.0; color: Qt.rgba(1,1,1,0.12) }
@@ -191,7 +191,7 @@ Item {
             radius: 24; color: Qt.rgba(0.05,0.10,0.25,0.96)
             border.color: Qt.rgba(1,1,1,0.30); border.width: 1
             Rectangle {
-                anchors { top: parent.top; left: parent.left; right: parent.right; margins: 1 }
+                anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right; anchors.margins: 1
                 height: 48; radius: parent.radius
                 gradient: Gradient {
                     GradientStop { position: 0.0; color: Qt.rgba(1,1,1,0.12) }
@@ -211,13 +211,13 @@ Item {
             Rectangle {
                 width: parent.width - 48; height: 46; radius: 12; anchors.horizontalCenter: parent.horizontalCenter
                 color: Qt.rgba(1,1,1,0.10); border.color: Qt.rgba(1,1,1,0.25); border.width: 1
-                TextInput { id: nameIn; anchors { fill: parent; leftMargin: 14; rightMargin: 14 }; verticalAlignment: TextInput.AlignVCenter; color: "white"; font.pixelSize: 15; placeholderText: "Имя"; placeholderTextColor: Qt.rgba(1,1,1,0.38) }
+                TextInput { id: nameIn; anchors.fill: parent; anchors.leftMargin: 14; anchors.rightMargin: 14; verticalAlignment: TextInput.AlignVCenter; color: "white"; font.pixelSize: 15; placeholderText: "Имя"; placeholderTextColor: Qt.rgba(1,1,1,0.38) }
             }
 
             Rectangle {
                 width: parent.width - 48; height: 46; radius: 12; anchors.horizontalCenter: parent.horizontalCenter
                 color: Qt.rgba(1,1,1,0.10); border.color: Qt.rgba(1,1,1,0.25); border.width: 1
-                TextInput { id: pinIn; anchors { fill: parent; leftMargin: 14; rightMargin: 14 }; verticalAlignment: TextInput.AlignVCenter; color: "white"; font.pixelSize: 15; echoMode: TextInput.Password; inputMethodHints: Qt.ImhDigitsOnly; maximumLength: 4; placeholderText: "PIN (необязательно)"; placeholderTextColor: Qt.rgba(1,1,1,0.38) }
+                TextInput { id: pinIn; anchors.fill: parent; anchors.leftMargin: 14; anchors.rightMargin: 14; verticalAlignment: TextInput.AlignVCenter; color: "white"; font.pixelSize: 15; echoMode: TextInput.Password; inputMethodHints: Qt.ImhDigitsOnly; maximumLength: 4; placeholderText: "PIN (необязательно)"; placeholderTextColor: Qt.rgba(1,1,1,0.38) }
             }
 
             Text { text: "Цвет аватара:"; color: Qt.rgba(1,1,1,0.65); font.pixelSize: 13 }
@@ -246,7 +246,8 @@ Item {
 
                 Rectangle {
                     width: 130; height: 44; radius: 22
-                    gradient: Gradient { orientation: Gradient.Horizontal; GradientStop { position: 0.0; color: "#1E88E5" }; GradientStop { position: 1.0; color: "#1565C0" } }
+                    gradient: Gradient { orientation: Gradient.Horizontal; GradientStop { position: 0.0; color: "#1E88E5" }
+                        GradientStop { position: 1.0; color: "#1565C0" } }
                     border.color: Qt.rgba(1,1,1,0.35); border.width: 1
                     Text { anchors.centerIn: parent; text: "Создать"; color: "white"; font.pixelSize: 14; font.weight: Font.Medium }
                     MouseArea {

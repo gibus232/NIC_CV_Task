@@ -7,33 +7,36 @@ Item {
 
     AeroHeader {
         id: hdr
-        anchors { top: parent.top; left: parent.left; right: parent.right }
+        anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right
         title: "Настройки"
     }
 
     Flickable {
-        anchors { top: hdr.bottom; left: parent.left; right: parent.right; bottom: parent.bottom }
+        anchors.top: hdr.bottom; anchors.left: parent.left; anchors.right: parent.right; anchors.bottom: parent.bottom
         contentHeight: settingsCol.height + 40; clip: true
 
         Column {
             id: settingsCol
             width: parent.width - 32
-            anchors { top: parent.top; topMargin: 16; horizontalCenter: parent.horizontalCenter }
+            anchors.top: parent.top; anchors.topMargin: 16; anchors.horizontalCenter: parent.horizontalCenter
             spacing: 12
 
             // Current user card
             Rectangle {
                 width: parent.width; height: 90; radius: 18
-                gradient: Gradient { orientation: Gradient.Horizontal; GradientStop { position: 0.0; color: "#0D47A1" }; GradientStop { position: 1.0; color: "#1565C0" } }
+                gradient: Gradient { orientation: Gradient.Horizontal; GradientStop { position: 0.0; color: "#0D47A1" }
+                        GradientStop { position: 1.0; color: "#1565C0" } }
                 border.color: Qt.rgba(1,1,1,0.28); border.width: 1
 
-                Rectangle { anchors { top: parent.top; left: parent.left; right: parent.right; margins: 1 }; height: parent.height*0.45; radius: parent.radius; gradient: Gradient { GradientStop { position: 0.0; color: Qt.rgba(1,1,1,0.18) }; GradientStop { position: 1.0; color: Qt.rgba(1,1,1,0.00) } } }
+                Rectangle { anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right; anchors.margins: 1; height: parent.height*0.45; radius: parent.radius; gradient: Gradient { GradientStop { position: 0.0; color: Qt.rgba(1,1,1,0.18) }
+                        GradientStop { position: 1.0; color: Qt.rgba(1,1,1,0.00) } } }
 
                 Row {
-                    anchors { fill: parent; leftMargin: 16; rightMargin: 16 }; spacing: 14
+                    anchors.fill: parent; anchors.leftMargin: 16; anchors.rightMargin: 16; spacing: 14
                     Rectangle {
                         width: 58; height: 58; radius: 29; anchors.verticalCenter: parent.verticalCenter
-                        gradient: Gradient { GradientStop { position: 0.0; color: Qt.lighter(userManager.currentUserColor,1.4) }; GradientStop { position: 1.0; color: userManager.currentUserColor } }
+                        gradient: Gradient { GradientStop { position: 0.0; color: Qt.lighter(userManager.currentUserColor,1.4) }
+                        GradientStop { position: 1.0; color: userManager.currentUserColor } }
                         border.color: Qt.rgba(1,1,1,0.45); border.width: 2
                         Text { anchors.centerIn: parent; text: userManager.currentUserName.length>0?userManager.currentUserName[0].toUpperCase():"?"; color: "white"; font.pixelSize: 26; font.weight: Font.Bold }
                     }
@@ -78,11 +81,11 @@ Item {
         color: Qt.rgba(1,1,1,0.07); border.color: Qt.rgba(1,1,1,0.14); border.width: 1
 
         Row {
-            anchors { fill: parent; leftMargin: 16; rightMargin: 16 }; spacing: 12
+            anchors.fill: parent; anchors.leftMargin: 16; anchors.rightMargin: 16; spacing: 12
             Text { anchors.verticalCenter: parent.verticalCenter; text: parent.parent.icon; color: "white"; font.pixelSize: 20; width: 28 }
             Text { anchors.verticalCenter: parent.verticalCenter; text: parent.parent.label; color: "white"; font.pixelSize: 15 }
         }
-        Text { anchors { right: parent.right; rightMargin: 16; verticalCenter: parent.verticalCenter }; text: "›"; color: Qt.rgba(1,1,1,0.40); font.pixelSize: 22 }
+        Text { anchors.right: parent.right; anchors.rightMargin: 16; anchors.verticalCenter: parent.verticalCenter; text: "›"; color: Qt.rgba(1,1,1,0.40); font.pixelSize: 22 }
 
         scale: sma.pressed ? 0.97 : 1.0
         Behavior on scale { NumberAnimation { duration: 80 } }

@@ -14,14 +14,14 @@ Item {
 
     AeroHeader {
         id: hdr
-        anchors { top: parent.top; left: parent.left; right: parent.right }
+        anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right
         title: root.isExpense ? "Расход" : "Доход"
         showBack: true
         onBackClicked: StackView.view.pop()
     }
 
     Flickable {
-        anchors { top: hdr.bottom; left: parent.left; right: parent.right; bottom: saveBtn.top; bottomMargin: 12 }
+        anchors.top: hdr.bottom; anchors.left: parent.left; anchors.right: parent.right; anchors.bottom: saveBtn.top; anchors.bottomMargin: 12
         contentHeight: mainCol.height + 20; clip: true
 
         Column {
@@ -104,7 +104,7 @@ Item {
                     color: Qt.rgba(1,1,1,0.10); border.color: Qt.rgba(1,1,1,0.22); border.width: 1
                     TextInput {
                         id: dateIn
-                        anchors { fill: parent; leftMargin: 14; rightMargin: 14 }
+                        anchors.fill: parent; anchors.leftMargin: 14; anchors.rightMargin: 14
                         verticalAlignment: TextInput.AlignVCenter
                         text: root.date; color: "white"; font.pixelSize: 15
                         onTextChanged: root.date = text
@@ -120,7 +120,7 @@ Item {
                     width: parent.width; height: 46; radius: 12
                     color: Qt.rgba(1,1,1,0.10); border.color: Qt.rgba(1,1,1,0.22); border.width: 1
                     TextInput {
-                        anchors { fill: parent; leftMargin: 14; rightMargin: 14 }
+                        anchors.fill: parent; anchors.leftMargin: 14; anchors.rightMargin: 14
                         verticalAlignment: TextInput.AlignVCenter
                         placeholderText: "Необязательно..."
                         placeholderTextColor: Qt.rgba(1,1,1,0.35)
@@ -135,7 +135,7 @@ Item {
     // Save button
     Rectangle {
         id: saveBtn
-        anchors { bottom: parent.bottom; bottomMargin: 30; left: parent.left; leftMargin: 24; right: parent.right; rightMargin: 24 }
+        anchors.bottom: parent.bottom; anchors.bottomMargin: 30; anchors.left: parent.left; anchors.leftMargin: 24; anchors.right: parent.right; anchors.rightMargin: 24
         height: 54; radius: 27
         opacity: root.amount > 0 && root.selectedCategoryId >= 0 ? 1.0 : 0.45
         gradient: Gradient {
@@ -146,7 +146,7 @@ Item {
         border.color: Qt.rgba(1,1,1,0.35); border.width: 1
 
         Rectangle {
-            anchors { top: parent.top; left: parent.left; right: parent.right; margins: 1 }
+            anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right; anchors.margins: 1
             height: parent.height * 0.50; radius: parent.radius
             gradient: Gradient {
                 GradientStop { position: 0.0; color: Qt.rgba(1,1,1,0.22) }

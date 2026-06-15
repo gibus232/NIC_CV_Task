@@ -17,14 +17,14 @@ Item {
 
     AeroHeader {
         id: hdr
-        anchors { top: parent.top; left: parent.left; right: parent.right }
+        anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right
         title: "Операции"
     }
 
     // Month selector
     Row {
         id: monthRow
-        anchors { top: hdr.bottom; topMargin: 12; horizontalCenter: parent.horizontalCenter }
+        anchors.top: hdr.bottom; anchors.topMargin: 12; anchors.horizontalCenter: parent.horizontalCenter
         spacing: 12
 
         Rectangle {
@@ -49,7 +49,7 @@ Item {
     // Filter buttons
     Row {
         id: filterRow
-        anchors { top: monthRow.bottom; topMargin: 10; horizontalCenter: parent.horizontalCenter }
+        anchors.top: monthRow.bottom; anchors.topMargin: 10; anchors.horizontalCenter: parent.horizontalCenter
         spacing: 8
 
         Repeater {
@@ -67,7 +67,7 @@ Item {
 
     ListView {
         id: txListView
-        anchors { top: filterRow.bottom; topMargin: 12; bottom: parent.bottom; bottomMargin: 8; left: parent.left; leftMargin: 16; right: parent.right; rightMargin: 16 }
+        anchors.top: filterRow.bottom; anchors.topMargin: 12; anchors.bottom: parent.bottom; anchors.bottomMargin: 8; anchors.left: parent.left; anchors.leftMargin: 16; anchors.right: parent.right; anchors.rightMargin: 16
         spacing: 10; clip: true
         model: root.txList()
 

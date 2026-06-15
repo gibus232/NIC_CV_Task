@@ -30,22 +30,24 @@ Item {
 
     AeroHeader {
         id: hdr
-        anchors { top: parent.top; left: parent.left; right: parent.right }
+        anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right
         title: "Отчёты"
     }
 
     Row {
         id: monthRow
-        anchors { top: hdr.bottom; topMargin: 12; horizontalCenter: parent.horizontalCenter }; spacing: 12
-        Rectangle { width: 36; height: 36; radius: 18; color: Qt.rgba(1,1,1,0.10); border.color: Qt.rgba(1,1,1,0.20); border.width: 1; Text { anchors.centerIn: parent; text: "‹"; color: "white"; font.pixelSize: 24 }; MouseArea { anchors.fill: parent; onClicked: { root.month = budgetManager.prevMonth(root.month); root.loadData() } } }
+        anchors.top: hdr.bottom; anchors.topMargin: 12; anchors.horizontalCenter: parent.horizontalCenter; spacing: 12
+        Rectangle { width: 36; height: 36; radius: 18; color: Qt.rgba(1,1,1,0.10); border.color: Qt.rgba(1,1,1,0.20); border.width: 1; Text { anchors.centerIn: parent; text: "‹"; color: "white"; font.pixelSize: 24 }
+                        MouseArea { anchors.fill: parent; onClicked: { root.month = budgetManager.prevMonth(root.month); root.loadData() } } }
         Text { anchors.verticalCenter: parent.verticalCenter; text: budgetManager.monthDisplayName(root.month); color: "white"; font.pixelSize: 16; font.weight: Font.Medium }
-        Rectangle { width: 36; height: 36; radius: 18; color: Qt.rgba(1,1,1,0.10); border.color: Qt.rgba(1,1,1,0.20); border.width: 1; Text { anchors.centerIn: parent; text: "›"; color: "white"; font.pixelSize: 24 }; MouseArea { anchors.fill: parent; onClicked: { root.month = budgetManager.nextMonth(root.month); root.loadData() } } }
+        Rectangle { width: 36; height: 36; radius: 18; color: Qt.rgba(1,1,1,0.10); border.color: Qt.rgba(1,1,1,0.20); border.width: 1; Text { anchors.centerIn: parent; text: "›"; color: "white"; font.pixelSize: 24 }
+                        MouseArea { anchors.fill: parent; onClicked: { root.month = budgetManager.nextMonth(root.month); root.loadData() } } }
     }
 
     // Income/Expense summary
     Row {
         id: summaryRow
-        anchors { top: monthRow.bottom; topMargin: 10; horizontalCenter: parent.horizontalCenter }; spacing: 12
+        anchors.top: monthRow.bottom; anchors.topMargin: 10; anchors.horizontalCenter: parent.horizontalCenter; spacing: 12
 
         Rectangle {
             width: 140; height: 64; radius: 16
@@ -68,7 +70,7 @@ Item {
     // Pie chart
     ChartView {
         id: chart
-        anchors { top: summaryRow.bottom; topMargin: 4; left: parent.left; right: parent.right }
+        anchors.top: summaryRow.bottom; anchors.topMargin: 4; anchors.left: parent.left; anchors.right: parent.right
         height: 220
         backgroundColor: "transparent"
         legend.visible: false
@@ -85,7 +87,7 @@ Item {
     // Category breakdown
     ListView {
         id: catList
-        anchors { top: chart.bottom; bottom: parent.bottom; bottomMargin: 8; left: parent.left; leftMargin: 16; right: parent.right; rightMargin: 16 }
+        anchors.top: chart.bottom; anchors.bottom: parent.bottom; anchors.bottomMargin: 8; anchors.left: parent.left; anchors.leftMargin: 16; anchors.right: parent.right; anchors.rightMargin: 16
         spacing: 8; clip: true
 
         delegate: Rectangle {
@@ -93,7 +95,7 @@ Item {
             color: Qt.rgba(1,1,1,0.07); border.color: Qt.rgba(1,1,1,0.14); border.width: 1
 
             Row {
-                anchors { fill: parent; leftMargin: 12; rightMargin: 12 }; spacing: 10
+                anchors.fill: parent; anchors.leftMargin: 12; anchors.rightMargin: 12; spacing: 10
                 Rectangle { width: 8; height: 8; radius: 4; anchors.verticalCenter: parent.verticalCenter; color: modelData.color || "#1565C0" }
                 Text { anchors.verticalCenter: parent.verticalCenter; text: modelData.name; color: "white"; font.pixelSize: 14; width: parent.width - 130; elide: Text.ElideRight }
                 Text { anchors.verticalCenter: parent.verticalCenter; text: Number(modelData.total).toLocaleString(Qt.locale("ru_RU"),"f",0)+" ₽"; color: Qt.rgba(1,1,1,0.75); font.pixelSize: 14; width: 100; horizontalAlignment: Text.AlignRight }

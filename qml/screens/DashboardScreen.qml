@@ -37,10 +37,10 @@ Item {
                     width: parent.width; height: 64
                     color: Qt.rgba(0,0.03,0.12,0.80)
 
-                    Rectangle { anchors { bottom: parent.bottom; left: parent.left; right: parent.right }; height: 1; color: Qt.rgba(1,1,1,0.18) }
+                    Rectangle { anchors.bottom: parent.bottom; anchors.left: parent.left; anchors.right: parent.right; height: 1; color: Qt.rgba(1,1,1,0.18) }
 
                     Row {
-                        anchors { left: parent.left; leftMargin: 16; verticalCenter: parent.verticalCenter }; spacing: 12
+                        anchors.left: parent.left; anchors.leftMargin: 16; anchors.verticalCenter: parent.verticalCenter; spacing: 12
 
                         Rectangle {
                             width: 40; height: 40; radius: 20
@@ -60,7 +60,7 @@ Item {
                     }
 
                     Rectangle {
-                        anchors { right: parent.right; rightMargin: 12; verticalCenter: parent.verticalCenter }
+                        anchors.right: parent.right; anchors.rightMargin: 12; anchors.verticalCenter: parent.verticalCenter
                         width: 40; height: 40; radius: 20
                         color: Qt.rgba(1,1,1,0.10); border.color: Qt.rgba(1,1,1,0.20); border.width: 1
                         Text { anchors.centerIn: parent; text: "⏎"; color: "white"; font.pixelSize: 20 }
@@ -82,7 +82,7 @@ Item {
                     anchors.topMargin: 16
 
                     Rectangle {
-                        anchors { top: parent.top; left: parent.left; right: parent.right; margins: 1 }
+                        anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right; anchors.margins: 1
                         height: parent.height * 0.45; radius: parent.radius
                         gradient: Gradient {
                             GradientStop { position: 0.0; color: Qt.rgba(1,1,1,0.18) }
@@ -172,7 +172,7 @@ Item {
     // Tab content loader
     StackLayout {
         id: tabs
-        anchors { top: parent.top; left: parent.left; right: parent.right; bottom: bottomNav.top }
+        anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right; anchors.bottom: bottomNav.top
         currentIndex: bottomNav.currentIndex
 
         Loader { active: tabs.currentIndex === 0; sourceComponent: homeComp }
@@ -184,7 +184,7 @@ Item {
 
     // FAB – add transaction
     Rectangle {
-        anchors { bottom: bottomNav.top; bottomMargin: 16; right: parent.right; rightMargin: 20 }
+        anchors.bottom: bottomNav.top; anchors.bottomMargin: 16; anchors.right: parent.right; anchors.rightMargin: 20
         width: 56; height: 56; radius: 28
         visible: bottomNav.currentIndex === 0 || bottomNav.currentIndex === 1
         gradient: Gradient {
@@ -194,7 +194,7 @@ Item {
         border.color: Qt.rgba(1,1,1,0.45); border.width: 2
 
         Rectangle {
-            anchors { top: parent.top; left: parent.left; right: parent.right; margins: 1 }
+            anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right; anchors.margins: 1
             height: parent.height * 0.48; radius: parent.radius
             gradient: Gradient {
                 GradientStop { position: 0.0; color: Qt.rgba(1,1,1,0.30) }
@@ -215,7 +215,7 @@ Item {
 
     BottomNav {
         id: bottomNav
-        anchors { bottom: parent.bottom; left: parent.left; right: parent.right }
+        anchors.bottom: parent.bottom; anchors.left: parent.left; anchors.right: parent.right
         onTabChanged: function(i) { currentIndex = i }
     }
 }

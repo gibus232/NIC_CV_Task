@@ -7,7 +7,7 @@ Rectangle {
     border.width: 1
 
     Rectangle {
-        anchors { top: parent.top; left: parent.left; right: parent.right; margins: 1 }
+        anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right; anchors.margins: 1
         height: parent.height * 0.45
         radius: parent.radius
         gradient: Gradient {
