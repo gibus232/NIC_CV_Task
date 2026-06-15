@@ -31,7 +31,7 @@ FamilyBudget/
 │   ├── database/           # SQLite обёртка
 │   └── models/             # UserManager, BudgetManager
 ├── qml/
-│   ├── main.qml
+│   ├── Main.qml
 │   ├── screens/            # Экраны приложения
 │   └── components/         # Frutiger Aero UI компоненты
 ├── android/            # Манифест + ресурсы

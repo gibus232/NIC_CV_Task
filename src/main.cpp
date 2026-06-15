@@ -39,16 +39,17 @@ int main(int argc, char *argv[])
                              qWarning() << "[QML]" << e.toString();
                      });
 
-    const QUrl url(QStringLiteral("qrc:/qt/qml/FamilyBudget/qml/main.qml"));
     QObject::connect(
-        &engine, &QQmlApplicationEngine::objectCreated, &app,
-        [url](QObject *obj, const QUrl &objUrl) {
-            if (!obj && url == objUrl)
-                qCritical() << "[FamilyBudget] Failed to create root object from" << objUrl.toString();
+        &engine, &QQmlApplicationEngine::objectCreationFailed, &app,
+        [](const QUrl &objUrl) {
+            qCritical() << "[FamilyBudget] Failed to create root object from" << objUrl.toString();
         },
         Qt::QueuedConnection);
 
-    engine.load(url);
+    // Load the root component by its module type name instead of a hardcoded
+    // qrc: path. This resolves the same way as `import FamilyBudget`, so it
+    // works regardless of how the build lays out the resource tree.
+    engine.loadFromModule("FamilyBudget", "Main");
 
     if (engine.rootObjects().isEmpty())
         qCritical() << "[FamilyBudget] No root QML objects were created.";

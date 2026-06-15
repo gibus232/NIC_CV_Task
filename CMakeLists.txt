@@ -36,7 +36,7 @@ qt_add_qml_module(FamilyBudget
     NO_LINT
     NO_CACHEGEN
     QML_FILES
-        qml/main.qml
+        qml/Main.qml
         qml/screens/LoginScreen.qml
         qml/screens/DashboardScreen.qml
         qml/screens/TransactionsScreen.qml
