@@ -33,6 +33,7 @@ qt_add_executable(FamilyBudget
 qt_add_qml_module(FamilyBudget
     URI FamilyBudget
     VERSION 1.0
+    NO_LINT
     QML_FILES
         qml/main.qml
         qml/screens/LoginScreen.qml
@@ -51,7 +52,6 @@ qt_add_qml_module(FamilyBudget
         qml/components/UserAvatar.qml
         qml/components/BudgetBar.qml
         qml/components/BottomNav.qml
-        qml/components/AeroDialog.qml
         qml/components/PinPad.qml
         qml/components/AmountDisplay.qml
     RESOURCES
