@@ -123,7 +123,6 @@ Item {
                         anchors.fill: parent; anchors.leftMargin: 14; anchors.rightMargin: 14
                         verticalAlignment: TextInput.AlignVCenter
                         placeholderText: "Необязательно..."
-                        placeholderTextColor: Qt.rgba(1,1,1,0.35)
                         color: "white"; font.pixelSize: 15
                         onTextChanged: root.note = text
                     }
