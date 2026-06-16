@@ -1,0 +1,98 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main, 'claude/**' ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+concurrency:
+  group: build-android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # Single Qt install for Android - automatically installs host tools too
+      # and sets QT_ROOT_DIR, QT_HOST_PATH, Qt6_DIR env vars
+      - name: Install Qt for Android
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.7.2'
+          host: 'linux'
+          target: 'android'
+          arch: 'android_arm64_v8a'
+          modules: ''
+          cache: true
+
+      - name: Install NDK, Ninja and Android platform 34
+        run: |
+          sudo apt-get install -y ninja-build
+          NDK="27.2.12479018"
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
+            "ndk;${NDK}" \
+            "platforms;android-34" \
+            "build-tools;34.0.0"
+          echo "ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/${NDK}" >> $GITHUB_ENV
+          # The runner ships preview platforms (android-35/36-ext*) whose
+          # android.jar is in a format the bundled aapt2 cannot parse:
+          #   "RES_TABLE_TYPE_TYPE entry offsets overlap actual entry data"
+          # androiddeployqt auto-selects the NEWEST installed platform, so we
+          # remove everything newer than 34 to force a working compileSdk.
+          echo "Platforms before cleanup:"; ls "$ANDROID_HOME/platforms" || true
+          for p in "$ANDROID_HOME"/platforms/android-3[5-9]*; do
+            [ -e "$p" ] && sudo rm -rf "$p" && echo "Removed $p"
+          done
+          echo "Platforms after cleanup:"; ls "$ANDROID_HOME/platforms" || true
+
+      - name: Debug Qt paths
+        run: |
+          echo "QT_ROOT_DIR=$QT_ROOT_DIR"
+          echo "QT_HOST_PATH=$QT_HOST_PATH"
+          echo "ANDROID_NDK_ROOT=$ANDROID_NDK_ROOT"
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          ls "$QT_ROOT_DIR/bin/qt-cmake" 2>/dev/null && echo "qt-cmake found" || echo "qt-cmake NOT found"
+          ls "$QT_ROOT_DIR/lib/cmake/Qt6/Qt6Config.cmake" 2>/dev/null && echo "Qt6Config.cmake found" || echo "Qt6Config.cmake NOT found"
+          ls "$QT_ROOT_DIR/lib/cmake/Qt6/qt.toolchain.cmake" 2>/dev/null && echo "qt.toolchain.cmake found" || echo "qt.toolchain.cmake NOT found"
+
+      - name: Configure CMake
+        run: |
+          # Use Qt's qt.toolchain.cmake which correctly sets CMAKE_FIND_ROOT_PATH_MODE_PACKAGE=BOTH
+          # This avoids the NDK toolchain's ONLY mode that blocks Qt discovery
+          $QT_ROOT_DIR/bin/qt-cmake -B build-android \
+            -DANDROID_ABI=arm64-v8a \
+            -DANDROID_PLATFORM=android-24 \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DQT_HOST_PATH="$QT_HOST_PATH" \
+            -DANDROID_SDK_ROOT="$ANDROID_HOME" \
+            -DANDROID_NDK_ROOT="$ANDROID_NDK_ROOT" \
+            -GNinja
+
+      - name: Build
+        run: cmake --build build-android --parallel $(nproc)
+
+      - name: Package APK
+        run: |
+          cmake --build build-android --target apk
+          find build-android -name "*.apk" | head -20
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: FamilyBudget-${{ github.sha }}
+          path: build-android/**/*.apk
+          if-no-files-found: warn
+          retention-days: 30
