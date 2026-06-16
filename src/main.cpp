@@ -28,6 +28,13 @@ int main(int argc, char *argv[])
     BudgetManager budgetManager(&db);
 
     QQmlApplicationEngine engine;
+
+    // Ensure the FamilyBudget module is discoverable from both the standard
+    // Qt resource path and the root resource path. On some Android builds the
+    // engine's default search path doesn't include all locations.
+    engine.addImportPath(QStringLiteral("qrc:/"));
+    engine.addImportPath(QStringLiteral("qrc:/qt/qml"));
+
     engine.rootContext()->setContextProperty("userManager", &userManager);
     engine.rootContext()->setContextProperty("budgetManager", &budgetManager);
 

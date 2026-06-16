@@ -47,7 +47,6 @@ ApplicationWindow {
     StackView {
         id: stackView
         anchors.fill: parent
-        initialItem: userManager.isLoggedIn ? dashboardComp : loginComp
 
         pushEnter:    Transition { NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 320; easing.type: Easing.OutCubic } }
         pushExit:     Transition { NumberAnimation { property: "opacity"; from: 1; to: 0; duration: 200 } }
@@ -55,6 +54,13 @@ ApplicationWindow {
         popExit:      Transition { NumberAnimation { property: "opacity"; from: 1; to: 0; duration: 200 } }
         replaceEnter: Transition { NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 400; easing.type: Easing.OutCubic } }
         replaceExit:  Transition { NumberAnimation { property: "opacity"; from: 1; to: 0; duration: 250 } }
+
+        // Defer the initial push until after all QML module types are fully
+        // registered. Using initialItem: directly races against the module
+        // registration on Android Qt 6.7, producing an empty stack.
+        Component.onCompleted: {
+            stackView.push(userManager.isLoggedIn ? dashboardComp : loginComp)
+        }
     }
 
     Connections {
