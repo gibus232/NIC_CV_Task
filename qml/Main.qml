@@ -41,9 +41,6 @@ ApplicationWindow {
         }
     }
 
-    Component { id: loginComp;     LoginScreen     {} }
-    Component { id: dashboardComp; DashboardScreen {} }
-
     StackView {
         id: stackView
         anchors.fill: parent
@@ -55,21 +52,23 @@ ApplicationWindow {
         replaceEnter: Transition { NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 400; easing.type: Easing.OutCubic } }
         replaceExit:  Transition { NumberAnimation { property: "opacity"; from: 1; to: 0; duration: 250 } }
 
-        // Defer the initial push until after all QML module types are fully
-        // registered. Using initialItem: directly races against the module
-        // registration on Android Qt 6.7, producing an empty stack.
+        // Use URL-based loading so files are resolved dynamically from the
+        // resource tree, bypassing any module type-registration race on Android.
         Component.onCompleted: {
-            stackView.push(userManager.isLoggedIn ? dashboardComp : loginComp)
+            var url = userManager.isLoggedIn
+                ? Qt.resolvedUrl("screens/DashboardScreen.qml")
+                : Qt.resolvedUrl("screens/LoginScreen.qml")
+            stackView.push(url)
         }
     }
 
     Connections {
         target: userManager
         function onCurrentUserChanged() {
-            if (userManager.isLoggedIn)
-                stackView.replace(dashboardComp)
-            else
-                stackView.replace(loginComp)
+            var url = userManager.isLoggedIn
+                ? Qt.resolvedUrl("screens/DashboardScreen.qml")
+                : Qt.resolvedUrl("screens/LoginScreen.qml")
+            stackView.replace(url)
         }
     }
 }
