@@ -15,7 +15,6 @@ find_package(Qt6 6.4 REQUIRED COMPONENTS
     Quick
     QuickControls2
     Sql
-    Charts
 )
 
 qt_standard_project_setup()
@@ -75,5 +74,4 @@ target_link_libraries(FamilyBudget PRIVATE
     Qt6::Quick
     Qt6::QuickControls2
     Qt6::Sql
-    Qt6::Charts
 )

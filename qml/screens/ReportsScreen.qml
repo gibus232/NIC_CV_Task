@@ -1,29 +1,22 @@
 import QtQuick
 import QtQuick.Controls
-import QtCharts
 import FamilyBudget
 
 Item {
     id: root
     property string month: budgetManager.currentMonth()
+    property double totalExpenses: 0
+    property double income: 0
+    property var catData: []
 
     function loadData() {
         var cats = budgetManager.getExpensesByCategory(userManager.currentUserId, month)
-        pieSeries.clear()
-        catList.model = cats
+        catData = cats
         var total = 0
         for (var i = 0; i < cats.length; i++) total += cats[i].total
         totalExpenses = total
-        for (var j = 0; j < cats.length; j++) {
-            var s = pieSeries.append(cats[j].name, cats[j].total)
-            s.color = cats[j].color || "#1565C0"
-            s.borderColor = Qt.rgba(1,1,1,0.15)
-        }
         income = budgetManager.getTotalIncome(userManager.currentUserId, month)
     }
-
-    property double totalExpenses: 0
-    property double income: 0
 
     Component.onCompleted: loadData()
     Connections { target: budgetManager; function onDataChanged() { loadData() } }
@@ -34,74 +27,163 @@ Item {
         title: "Отчёты"
     }
 
-    Row {
-        id: monthRow
-        anchors.top: hdr.bottom; anchors.topMargin: 12; anchors.horizontalCenter: parent.horizontalCenter; spacing: 12
-        Rectangle { width: 36; height: 36; radius: 18; color: Qt.rgba(1,1,1,0.10); border.color: Qt.rgba(1,1,1,0.20); border.width: 1; Text { anchors.centerIn: parent; text: "‹"; color: "white"; font.pixelSize: 24 }
-                        MouseArea { anchors.fill: parent; onClicked: { root.month = budgetManager.prevMonth(root.month); root.loadData() } } }
-        Text { anchors.verticalCenter: parent.verticalCenter; text: budgetManager.monthDisplayName(root.month); color: "white"; font.pixelSize: 16; font.weight: Font.Medium }
-        Rectangle { width: 36; height: 36; radius: 18; color: Qt.rgba(1,1,1,0.10); border.color: Qt.rgba(1,1,1,0.20); border.width: 1; Text { anchors.centerIn: parent; text: "›"; color: "white"; font.pixelSize: 24 }
-                        MouseArea { anchors.fill: parent; onClicked: { root.month = budgetManager.nextMonth(root.month); root.loadData() } } }
-    }
+    Flickable {
+        anchors.top: hdr.bottom; anchors.left: parent.left; anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        contentHeight: contentCol.height + 24
+        clip: true
 
-    // Income/Expense summary
-    Row {
-        id: summaryRow
-        anchors.top: monthRow.bottom; anchors.topMargin: 10; anchors.horizontalCenter: parent.horizontalCenter; spacing: 12
+        Column {
+            id: contentCol
+            width: parent.width
+            spacing: 0
 
-        Rectangle {
-            width: 140; height: 64; radius: 16
-            color: Qt.rgba(0.1,0.45,0.1,0.22); border.color: Qt.rgba(0.4,0.9,0.4,0.25); border.width: 1
-            Column { anchors.centerIn: parent; spacing: 4
-                Text { anchors.horizontalCenter: parent.horizontalCenter; text: "Доход"; color: "#A5D6A7"; font.pixelSize: 12 }
-                Text { anchors.horizontalCenter: parent.horizontalCenter; text: Number(root.income).toLocaleString(Qt.locale("ru_RU"),"f",0)+" ₽"; color: "#66BB6A"; font.pixelSize: 17; font.weight: Font.SemiBold }
-            }
-        }
-        Rectangle {
-            width: 140; height: 64; radius: 16
-            color: Qt.rgba(0.45,0.1,0.1,0.22); border.color: Qt.rgba(0.9,0.35,0.35,0.25); border.width: 1
-            Column { anchors.centerIn: parent; spacing: 4
-                Text { anchors.horizontalCenter: parent.horizontalCenter; text: "Расход"; color: "#EF9A9A"; font.pixelSize: 12 }
-                Text { anchors.horizontalCenter: parent.horizontalCenter; text: Number(root.totalExpenses).toLocaleString(Qt.locale("ru_RU"),"f",0)+" ₽"; color: "#EF5350"; font.pixelSize: 17; font.weight: Font.SemiBold }
-            }
-        }
-    }
-
-    // Pie chart
-    ChartView {
-        id: chart
-        anchors.top: summaryRow.bottom; anchors.topMargin: 4; anchors.left: parent.left; anchors.right: parent.right
-        height: 220
-        backgroundColor: "transparent"
-        legend.visible: false
-        antialiasing: true
-        animationOptions: ChartView.AllAnimations
-
-        PieSeries {
-            id: pieSeries
-            holeSize: 0.48
-            size: 0.88
-        }
-    }
-
-    // Category breakdown
-    ListView {
-        id: catList
-        anchors.top: chart.bottom; anchors.bottom: parent.bottom; anchors.bottomMargin: 8; anchors.left: parent.left; anchors.leftMargin: 16; anchors.right: parent.right; anchors.rightMargin: 16
-        spacing: 8; clip: true
-
-        delegate: Rectangle {
-            width: catList.width; height: 48; radius: 12
-            color: Qt.rgba(1,1,1,0.07); border.color: Qt.rgba(1,1,1,0.14); border.width: 1
-
+            // Month selector
+            Item { width: parent.width; height: 12 }
             Row {
-                anchors.fill: parent; anchors.leftMargin: 12; anchors.rightMargin: 12; spacing: 10
-                Rectangle { width: 8; height: 8; radius: 4; anchors.verticalCenter: parent.verticalCenter; color: modelData.color || "#1565C0" }
-                Text { anchors.verticalCenter: parent.verticalCenter; text: modelData.name; color: "white"; font.pixelSize: 14; width: parent.width - 130; elide: Text.ElideRight }
-                Text { anchors.verticalCenter: parent.verticalCenter; text: Number(modelData.total).toLocaleString(Qt.locale("ru_RU"),"f",0)+" ₽"; color: Qt.rgba(1,1,1,0.75); font.pixelSize: 14; width: 100; horizontalAlignment: Text.AlignRight }
-            }
-        }
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: 12
 
-        Text { visible: catList.count === 0; anchors.centerIn: parent; text: "Расходов за этот месяц нет"; color: Qt.rgba(1,1,1,0.40); font.pixelSize: 15 }
+                Rectangle {
+                    width: 36; height: 36; radius: 18
+                    color: Qt.rgba(1,1,1,0.10); border.color: Qt.rgba(1,1,1,0.20); border.width: 1
+                    Text { anchors.centerIn: parent; text: "‹"; color: "white"; font.pixelSize: 24 }
+                    MouseArea { anchors.fill: parent; onClicked: { root.month = budgetManager.prevMonth(root.month); root.loadData() } }
+                }
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: budgetManager.monthDisplayName(root.month)
+                    color: "white"; font.pixelSize: 16; font.weight: Font.Medium
+                }
+                Rectangle {
+                    width: 36; height: 36; radius: 18
+                    color: Qt.rgba(1,1,1,0.10); border.color: Qt.rgba(1,1,1,0.20); border.width: 1
+                    Text { anchors.centerIn: parent; text: "›"; color: "white"; font.pixelSize: 24 }
+                    MouseArea { anchors.fill: parent; onClicked: { root.month = budgetManager.nextMonth(root.month); root.loadData() } }
+                }
+            }
+            Item { width: parent.width; height: 12 }
+
+            // Income / Expense summary cards
+            Row {
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: 12
+
+                Rectangle {
+                    width: 148; height: 68; radius: 18
+                    color: Qt.rgba(0.08,0.38,0.08,0.28)
+                    border.color: Qt.rgba(0.35,0.85,0.35,0.28); border.width: 1
+                    Column {
+                        anchors.centerIn: parent; spacing: 5
+                        Text { anchors.horizontalCenter: parent.horizontalCenter; text: "↑ Доход"; color: "#A5D6A7"; font.pixelSize: 12 }
+                        Text { anchors.horizontalCenter: parent.horizontalCenter; text: Number(root.income).toLocaleString(Qt.locale("ru_RU"),"f",0)+" ₽"; color: "#66BB6A"; font.pixelSize: 18; font.weight: Font.SemiBold }
+                    }
+                }
+                Rectangle {
+                    width: 148; height: 68; radius: 18
+                    color: Qt.rgba(0.38,0.08,0.08,0.28)
+                    border.color: Qt.rgba(0.85,0.30,0.30,0.28); border.width: 1
+                    Column {
+                        anchors.centerIn: parent; spacing: 5
+                        Text { anchors.horizontalCenter: parent.horizontalCenter; text: "↓ Расход"; color: "#EF9A9A"; font.pixelSize: 12 }
+                        Text { anchors.horizontalCenter: parent.horizontalCenter; text: Number(root.totalExpenses).toLocaleString(Qt.locale("ru_RU"),"f",0)+" ₽"; color: "#EF5350"; font.pixelSize: 18; font.weight: Font.SemiBold }
+                    }
+                }
+            }
+            Item { width: parent.width; height: 20 }
+
+            // Section label
+            Text {
+                anchors.left: parent.left; anchors.leftMargin: 20
+                text: "Расходы по категориям"
+                color: Qt.rgba(1,1,1,0.50); font.pixelSize: 12
+            }
+            Item { width: parent.width; height: 10 }
+
+            // Category bars
+            Column {
+                width: parent.width - 32
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: 10
+
+                Repeater {
+                    model: root.catData
+                    delegate: Rectangle {
+                        id: bar
+                        width: parent.width; height: 60; radius: 14
+                        color: Qt.rgba(1,1,1,0.07); border.color: Qt.rgba(1,1,1,0.14); border.width: 1
+
+                        property double pct: root.totalExpenses > 0 ? modelData.total / root.totalExpenses : 0
+
+                        // Glossy highlight
+                        Rectangle {
+                            anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right; anchors.margins: 1
+                            height: parent.height * 0.45; radius: parent.radius
+                            gradient: Gradient {
+                                GradientStop { position: 0.0; color: Qt.rgba(1,1,1,0.08) }
+                                GradientStop { position: 1.0; color: Qt.rgba(1,1,1,0.00) }
+                            }
+                        }
+
+                        Column {
+                            anchors.left: parent.left; anchors.right: parent.right
+                            anchors.leftMargin: 14; anchors.rightMargin: 14
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: 7
+
+                            Item {
+                                width: parent.width; height: 16
+                                Rectangle {
+                                    width: 10; height: 10; radius: 5
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    color: modelData.color || "#1565C0"
+                                }
+                                Text {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    anchors.left: parent.left; anchors.leftMargin: 18
+                                    anchors.right: amtLabel.left; anchors.rightMargin: 8
+                                    text: modelData.name
+                                    color: "white"; font.pixelSize: 13
+                                    elide: Text.ElideRight
+                                }
+                                Text {
+                                    id: amtLabel
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    anchors.right: parent.right
+                                    text: Number(modelData.total).toLocaleString(Qt.locale("ru_RU"),"f",0)+" ₽"
+                                    color: Qt.rgba(1,1,1,0.75); font.pixelSize: 13
+                                }
+                            }
+
+                            // Progress bar
+                            Rectangle {
+                                width: parent.width; height: 5; radius: 3
+                                color: Qt.rgba(1,1,1,0.10)
+                                Rectangle {
+                                    width: parent.width * bar.pct
+                                    height: parent.height; radius: parent.radius
+                                    color: modelData.color || "#1565C0"
+                                    Behavior on width { NumberAnimation { duration: 400; easing.type: Easing.OutCubic } }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Empty state
+                Rectangle {
+                    visible: root.catData.length === 0
+                    width: parent.width; height: 80; radius: 16
+                    color: Qt.rgba(1,1,1,0.05); border.color: Qt.rgba(1,1,1,0.12); border.width: 1
+                    Text {
+                        anchors.centerIn: parent
+                        text: "Расходов за этот месяц нет"
+                        color: Qt.rgba(1,1,1,0.40); font.pixelSize: 15
+                    }
+                }
+            }
+
+            Item { width: parent.width; height: 16 }
+        }
     }
 }
