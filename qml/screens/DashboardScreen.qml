@@ -11,6 +11,7 @@ Item {
         id: homeComp
 
         Flickable {
+            id: homeFlic
             contentHeight: homeCol.height + 30
             clip: true
 
@@ -25,7 +26,7 @@ Item {
                 balance  = income - expenses
             }
 
-            Connections { target: budgetManager; function onDataChanged() { parent.refresh() } }
+            Connections { target: budgetManager; function onDataChanged() { homeFlic.refresh() } }
 
             Column {
                 id: homeCol
@@ -55,7 +56,7 @@ Item {
                         Column {
                             anchors.verticalCenter: parent.verticalCenter; spacing: 2
                             Text { text: "Привет, " + userManager.currentUserName; color: "white"; font.pixelSize: 16; font.weight: Font.Medium }
-                            Text { text: budgetManager.monthDisplayName(parent.parent.parent.month); color: Qt.rgba(1,1,1,0.58); font.pixelSize: 12 }
+                            Text { text: budgetManager.monthDisplayName(homeFlic.month); color: Qt.rgba(1,1,1,0.58); font.pixelSize: 12 }
                         }
                     }
 
@@ -95,8 +96,8 @@ Item {
                         Text { anchors.horizontalCenter: parent.horizontalCenter; text: "Баланс за месяц"; color: Qt.rgba(1,1,1,0.72); font.pixelSize: 14 }
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
-                            text: (parent.parent.parent.balance >= 0 ? "+" : "") +
-                                  Number(parent.parent.parent.balance).toLocaleString(Qt.locale("ru_RU"),"f",2) + " ₽"
+                            text: (homeFlic.balance >= 0 ? "+" : "") +
+                                  Number(homeFlic.balance).toLocaleString(Qt.locale("ru_RU"),"f",2) + " ₽"
                             color: "white"; font.pixelSize: 36; font.weight: Font.Bold
                         }
                     }
@@ -115,7 +116,7 @@ Item {
                         Column {
                             anchors.centerIn: parent; spacing: 6
                             Text { anchors.horizontalCenter: parent.horizontalCenter; text: "↑ Доход"; color: "#A5D6A7"; font.pixelSize: 13 }
-                            Text { anchors.horizontalCenter: parent.horizontalCenter; text: Number(parent.parent.parent.parent.income).toLocaleString(Qt.locale("ru_RU"),"f",0)+" ₽"; color: "#66BB6A"; font.pixelSize: 20; font.weight: Font.SemiBold }
+                            Text { anchors.horizontalCenter: parent.horizontalCenter; text: Number(homeFlic.income).toLocaleString(Qt.locale("ru_RU"),"f",0)+" ₽"; color: "#66BB6A"; font.pixelSize: 20; font.weight: Font.SemiBold }
                         }
                     }
 
@@ -127,7 +128,7 @@ Item {
                         Column {
                             anchors.centerIn: parent; spacing: 6
                             Text { anchors.horizontalCenter: parent.horizontalCenter; text: "↓ Расход"; color: "#EF9A9A"; font.pixelSize: 13 }
-                            Text { anchors.horizontalCenter: parent.horizontalCenter; text: Number(parent.parent.parent.parent.expenses).toLocaleString(Qt.locale("ru_RU"),"f",0)+" ₽"; color: "#EF5350"; font.pixelSize: 20; font.weight: Font.SemiBold }
+                            Text { anchors.horizontalCenter: parent.horizontalCenter; text: Number(homeFlic.expenses).toLocaleString(Qt.locale("ru_RU"),"f",0)+" ₽"; color: "#EF5350"; font.pixelSize: 20; font.weight: Font.SemiBold }
                         }
                     }
                 }
